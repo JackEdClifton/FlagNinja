@@ -19,10 +19,13 @@ int main() {
 	Timer timer;
 
 	// create floor
-	Platform floor(100.0f, 300.0f, "./assets/floor.png");
+	Platform floor(300.0f, 300.0f, "./assets/floorTile.psd");
 
 	// mainloop
 	while (window.isOpen()) {
+
+		if (abs(player.getPosition().x) > 1000.0f || abs(player.getPosition().y) > 1000.0f)
+			std::cout << "Position:  " << player.getPosition().x << ", " << player.getPosition().y << std::endl;
 
 		sf::Event sfEvent;
 		while (window.pollEvent(sfEvent)) {
@@ -34,7 +37,7 @@ int main() {
 		// update objects
 		timer.update();
 		player.update(timer.deltaTime);
-		player.checkCollisions(floor);
+		player.olcRayVsRect(floor);
 
 		// draw objects
 		window.draw(player);

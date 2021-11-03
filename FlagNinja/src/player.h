@@ -4,37 +4,34 @@
 #include <Windows.h>
 #include "platform.h"
 
-// pre-compiler definitions for directions
-#define left	0b0001
-#define right	0b0010
-#define top		0b0100
-#define base	0b1000
+struct Collision {
+	const Platform* platform;
+	float time;
+	sf::Vector2f contact_normal;
+	sf::Vector2f contact_point;
 
-
-struct Line {
-	float m, c;
-
-	char isColliding(const sf::Vector2f& pos, const sf::Vector2f& size) {
-		float y1 = m * pos.x + c;
-		float y2 = m * (pos.x + size.x) + c;
-
-		char sides = 0;
-
-		// intersects left side
-		sides |= left * (y1 > pos.y && y1 < pos.y + size.y);
-
-		// intersects right side
-		sides |= right * (y2 > pos.y && y2 < pos.y + size.y);
-
-		// intersects top side
-		sides |= top * (y1 < pos.y&& y2 > pos.y);
-
-		// intersects base side
-		sides |= base * (y1 > pos.y && y2 < pos.y);
-
-		return sides;
+	Collision(const Platform* platform, const float time, const sf::Vector2f contact_normal, const sf::Vector2f contact_point) {
+		this->platform = platform;
+		this->time = time;
+		this->contact_normal = contact_normal;
+		this->contact_point = contact_point;
 	}
 };
+
+// override devision operator
+sf::Vector2f operator/(sf::Vector2f a, sf::Vector2f b) {
+	a.x /= b.x;
+	a.y /= b.y;
+	return a;
+}
+
+// override multiplication operator
+sf::Vector2f operator*(sf::Vector2f a, sf::Vector2f b) {
+	a.x *= b.x;
+	a.y *= b.y;
+	return a;
+}
+
 
 class Player : public sf::Sprite {
 
@@ -44,14 +41,32 @@ class Player : public sf::Sprite {
 	sf::Vector2f lastPos = sf::Vector2f(0.0f, 0.0f);
 	sf::Vector2f movementVector;
 
+	std::vector<Collision> collidingPlatforms;
+
 	float mass = 5.0f;
 	float drag = 0.995f;
 	float maxVel = 30.0f;
-	float jumpVel = -100.0f;
+	float jumpVel = -40.0f;
 
 	bool controlsActive = true;
 	bool isColliding = true;
 
+	void resolveCollisions() {
+		std::sort(
+			collidingPlatforms.begin(),
+			collidingPlatforms.end(),
+			[](const Collision& a, const Collision& b) { return a.time < b.time; }
+		);
+
+		for (const Collision& collision : collidingPlatforms) {
+			sf::Vector2f distance = (collision.contact_point - pos) * (collision.contact_normal);
+			std::cout << "Distance:" << distance.x << ", " << distance.y << std::endl;
+
+			if (std::isnan(distance.x) || std::isnan(distance.y))
+				return;
+			pos += distance;
+		}
+	}
 
 public:
 
@@ -68,9 +83,12 @@ public:
 	// handle position
 	void update(float timeDelta) {
 
-		std::cout << "Position: " << pos.x << ", " << pos.y << std::endl;
+		// clear colliding platforms
+		resolveCollisions();
+		collidingPlatforms.clear();
 
 		// update object attributes
+		setPosition(pos.x, pos.y);
 		lastPos = pos;
 
 		// ignore if in pause menu or somethn
@@ -84,81 +102,66 @@ public:
 		vel.y += mass * 9.8f * timeDelta;
 
 		// jumping
-		if ((GetAsyncKeyState('W') || GetAsyncKeyState(' ')) && isColliding) {
-			vel.y = jumpVel;
-		}
+		//if ((GetAsyncKeyState('W') || GetAsyncKeyState(' ')) && isColliding) { vel.y = jumpVel; }
 
 		// moving x axis
 		if (GetAsyncKeyState('A')) { vel.x = -maxVel; }
 		if (GetAsyncKeyState('D')) { vel.x = maxVel; }
+		if (GetAsyncKeyState('W')) { vel.y = -maxVel; }  // temp for debugging
+		if (GetAsyncKeyState('S')) { vel.y = maxVel; }  // temp for debugging
 
 		// stops moving at low speeds for ages
-		vel.x *= (vel.x > 0.1f);
-		vel.y *= (vel.y > 0.1f);
+		vel.x *= (abs(vel.x) > 0.1f);
+		vel.y *= (abs(vel.y) > 0.1f);
 
 		// move player
 		movementVector.x = vel.x * timeDelta;
 		movementVector.y = vel.y * timeDelta;
 		pos.x += movementVector.x;
 		pos.y += movementVector.y;
-		setPosition(pos.x, pos.y);
-
-
 	}
 
-	// handle collisions
-	void checkCollisions(const Platform& platform) {
 
-		// platform
-		sf::Vector2f platformPos = platform.getPosition();
-		sf::Vector2f platformSize = sf::Vector2f(platform.getTexture()->getSize());
-		
+#define ray_origin lastPos
+#define ray_dir movementVector
+	void olcRayVsRect(const Platform& target) {
+
+		sf::Vector2f contact_point, contact_normal;
+		float t_hit_near;
+
+		sf::Vector2f targetPos = target.getPosition();
+		sf::Vector2f targetSize = sf::Vector2f(target.getTexture()->getSize());
+
 		// expand platform by size of player
-		platformPos -= size;
-		platformSize += size;
-		
-		// get equation of velocity
-		Line velocityLine;
-		velocityLine.m = vel.y / vel.x;
-		velocityLine.c = pos.y - (velocityLine.m * pos.x);
+		targetPos -= size;
+		targetSize += size;
 
-		// get contact points
-		char collisionSides = velocityLine.isColliding(platformPos, platformSize);
+		sf::Vector2f t_near = (targetPos - ray_origin) / ray_dir;
+		sf::Vector2f t_far = (targetPos + targetSize - ray_origin) / ray_dir;
 
-		// make sure there is a collision
-		int totalSidesCollided = 0;
-		for (char mask = 1; mask; mask <= 1)
-			if (collisionSides & mask)
-				totalSidesCollided += 1;
+		if (t_near.x > t_far.x) std::swap(t_near.x, t_far.x);
+		if (t_near.y > t_far.y) std::swap(t_near.y, t_far.y);
 
-		if (totalSidesCollided == 0) return;
-		if (totalSidesCollided == 1) std::cerr << "ERROR:  1 sides of collision";
-		if (totalSidesCollided == 3) std::cerr << "ERROR:  3 sides of collision";
-		if (totalSidesCollided == 4) std::cerr << "ERROR:  3 sides of collision";
+		if (t_near.x > t_far.y || t_near.y > t_far.x) return;
 
-		// get closest contact point from lastPos
-		if (collisionSides & (left | right))
-			if (vel.x > 0.0f)
-				pos.x = platformPos.x;
-			else
-				pos.x = platformPos.x + platformSize.x;
+		t_hit_near = std::max(t_near.x, t_near.y);
+		float t_hit_far = std::min(t_far.x, t_far.y);
 
-		if (collisionSides & (top | base))
-			if (vel.y > 0.0f)
-				pos.y = platformPos.y;
-			else
-				pos.y = platformPos.y + platformSize.y;
+		if (t_hit_far < 0) return;
 
-		// idk wtf im doing
+
+		contact_point = ray_origin + t_hit_near * ray_dir;
+
+		if (t_near.x > t_near.y)
+			if (ray_dir.x < 0)	contact_normal = { 1, 0 };	// + colliding right
+			else				contact_normal = { 1, 0 };	// - colliding left
+		else if (t_near.x < t_near.y)
+			if (ray_dir.y < 0)	contact_normal = { 0, 1 };	// + colliding base
+			else				contact_normal = { 0, 1 };	// - colliding top
 
 		// add rect to std::vector of colliding platforms
-
-		// check if not colliding - old, allows tunneling
-		if (pos.x > platformPos.x + platformSize.x) { return; }
-		if (pos.x + size.x < platformPos.x) { return; }
-		if (pos.y > platformPos.y + platformSize.y) { return; }
-		if (pos.y + size.y < platformPos.y) { return; }
-
+		if (t_hit_near <= 1.0f)
+			collidingPlatforms.push_back(Collision(&target, t_hit_near, contact_normal, contact_point));
 	}
 
 };
