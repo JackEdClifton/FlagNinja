@@ -171,12 +171,11 @@
     <ClInclude Include="src\player.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assets\floor.png" />
-    <Image Include="assets\img.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="assets\floorTile.psd" />
     <None Include="assets\player.psd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="assets\maps\0.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -11,21 +11,16 @@
 
 int main() {
 
-	// create window
-	sf::RenderWindow window(sf::VideoMode(600, 600), "Title");
+	sf::RenderWindow window(sf::VideoMode(1200, 800), "Title");
+	Game game;
 
-	// create player object
-	Player player("./assets/img.png");
-	Timer timer;
-
-	// create floor
-	Platform floor(300.0f, 300.0f, "./assets/floorTile.psd");
 
 	// mainloop
 	while (window.isOpen()) {
 
-		if (abs(player.getPosition().x) > 1000.0f || abs(player.getPosition().y) > 1000.0f)
-			std::cout << "Position:  " << player.getPosition().x << ", " << player.getPosition().y << std::endl;
+		for (auto& player : game.getPlayers())
+			if (abs(player.getPosition().x) > 1000.0f || abs(player.getPosition().y) > 1000.0f)
+				std::cout << "Absurd Position:  " << player.getPosition().x << ", " << player.getPosition().y << std::endl;
 
 		sf::Event sfEvent;
 		while (window.pollEvent(sfEvent)) {
@@ -35,16 +30,26 @@ int main() {
 		}
 
 		// update objects
-		timer.update();
-		player.update(timer.deltaTime);
-		player.olcRayVsRect(floor);
+		game.timer.update();
 
-		// draw objects
-		window.draw(player);
-		window.draw(floor);
+		// handle floor stuff
+		for (auto& platform : game.getPlatforms()) {
+			window.draw(platform);
+		}
+
+		// handle player stuff
+		for (auto& player : game.getPlayers()) {
+			player.update(game.timer.deltaTime);
+
+			for (auto& platform : game.getPlatforms())
+				player.checkCollision(platform);
+			
+			window.draw(player);
+		}
+
 
 		window.display();
-		window.clear(sf::Color(0, 0, 100));
+		window.clear(sf::Color(30, 50, 240));
 	}
 
 	window.close();
