@@ -1,21 +1,9 @@
+// source: https://www.youtube.com/watch?v=8JJ-4JgR7Dg
+
 #pragma once
 
 #include <Windows.h>
 #include "platform.h"
-
-struct Collision {
-	const Platform* platform;
-	float time;
-	sf::Vector2f contactNormal;
-	sf::Vector2f contactPoint;
-
-	Collision(const Platform* platform, const float time, const sf::Vector2f contactNormal, const sf::Vector2f contactPoint) {
-		this->platform = platform;
-		this->time = time;
-		this->contactNormal = contactNormal;
-		this->contactPoint = contactPoint;
-	}
-};
 
 // override devision operator
 sf::Vector2f operator/(sf::Vector2f a, sf::Vector2f b) {
@@ -37,47 +25,15 @@ class Player : public sf::Sprite {
 	sf::Vector2f pos;
 	sf::Vector2f size;
 	sf::Vector2f vel = sf::Vector2f(0.0f, 0.0f);
-	sf::Vector2f lastPos = sf::Vector2f(0.0f, 0.0f);
-	sf::Vector2f movementVector;
+	std::vector<std::pair<const Platform*, float>> collisions;
 
-	std::vector<Collision> collidingPlatforms;
-
-	float mass = 10.0f;
-	float drag = 0.995f;
-	float maxVel = 50.0f;
-	float jumpVel = -400.0f;
-	float jumpCoolDownTime = 0.0f;
-	float jumpSetCoolDownTime = 2.0f;
+	const float gravity = 200.0f;
+	const float drag = 1.0f - 0.2f;
+	const float maxVel = 400.0f;
+	const float jumpVel = -200.0f;
 
 	bool controlsActive = true;
-	bool isColliding = false;
-
-	void resolveCollisions() {
-
-		// exit if there are no collisons
-		if (!collidingPlatforms.size())
-			return;
-
-		isColliding = true;
-		
-		// closest collision must be processed first
-		std::sort(
-			collidingPlatforms.begin(),
-			collidingPlatforms.end(),
-			[](const Collision& a, const Collision& b) { return a.time < b.time; }
-		);
-
-		for (const Collision& collision : collidingPlatforms) {
-			sf::Vector2f distance = (collision.contactPoint - pos) * (collision.contactNormal);
-
-			if (std::isnan(distance.x) || std::isnan(distance.y))
-				return;
-			pos += distance;
-		}
-
-		collidingPlatforms.clear();
-	}
-
+	
 public:
 
 	// constructor
@@ -92,90 +48,92 @@ public:
 		size = sf::Vector2f(getTexture()->getSize());
 	}
 
-	// handle position
-	void update(float timeDelta) {
-
-		// clear colliding platforms
-		isColliding = false;
-		resolveCollisions();
-
-		// update object attributes
-		setPosition(pos.x, pos.y);
-		lastPos = pos;
-
-		// ignore if in pause menu or somethn
-		if (!controlsActive) { return; }
-
-		// simulate drag
-		vel.x *= timeDelta * drag;
-		vel.y *= timeDelta * drag;
-
-		// gravity
-		vel.y += mass * 9.8f * timeDelta;
-
-		// jumping
-		jumpCoolDownTime -= timeDelta * bool(jumpCoolDownTime);
-		jumpCoolDownTime *= jumpCoolDownTime >= 0.0f;
-
-		if ((GetAsyncKeyState('W') || GetAsyncKeyState(' ')) && isColliding && !jumpCoolDownTime) {
-			vel.y = jumpVel;
-			jumpCoolDownTime = jumpSetCoolDownTime;
-		}
-
-		// moving x axis
+	// handle user input
+	void handleInput(float deltaTime) {
+		// reset position, for debugging purposes
+		if (GetAsyncKeyState('Q')) pos = { 0.0f, 0.0f };
+		
+		// x axis input
 		if (GetAsyncKeyState('A')) { vel.x = -maxVel; }
 		if (GetAsyncKeyState('D')) { vel.x = maxVel; }
 
-		// stops moving at low speeds for ages
-		vel.x *= (abs(vel.x) > 0.1f);
-		vel.y *= (abs(vel.y) > 0.1f);
+		// jump input
+		if ((GetAsyncKeyState('W') || GetAsyncKeyState(' ')))
+			vel.y = jumpVel;
+	}
 
+	// apply physics
+	void updatePhysics(float deltaTime) {
+		// drag & gravity
+		vel.x *= drag;
+		vel.y += gravity * deltaTime;
+	}
+
+	// handle position
+	void update(float deltaTime) {
 		// move player
-		movementVector.x = vel.x * timeDelta;
-		movementVector.y = vel.y * timeDelta;
-		pos.x += movementVector.x;
-		pos.y += movementVector.y;
+		pos += vel * deltaTime;
+		setPosition({ pos });
 	}
 
 
-	// source: https://www.youtube.com/watch?v=8JJ-4JgR7Dg
-	void checkCollision(const Platform& target) {
+	void checkCollision(const float deltaTime, const Platform& _target, const bool resolve = false) {
 
-		sf::Vector2f contactPoint, contactNormal;
-		float tHitNear;
+		// check rect is moving
+		if (this->vel.x == 0 && this->vel.y == 0) return;
 
-		sf::Vector2f targetPos = target.getPosition();
-		sf::Vector2f targetSize = sf::Vector2f(target.getTexture()->getSize());
+		// expand player rect
+		sf::Vector2f targetPos = _target.getPosition();
+		sf::Vector2f targetSize = sf::Vector2f(_target.getTexture()->getSize());
 
-		// expand platform by size of player
-		targetPos -= size;
-		targetSize += size;
+		targetPos -= this->size / 2.0f;
+		targetSize += this->size;
 
-		sf::Vector2f tNear = (targetPos - lastPos) / movementVector;
-		sf::Vector2f tFar = (targetPos + targetSize - lastPos) / movementVector;
+		const sf::Vector2f& ray_origin = this->pos + this->size / 2.0f;
+		const sf::Vector2f& ray_dir = this->vel * deltaTime;
 
-		if (tNear.x > tFar.x) std::swap(tNear.x, tFar.x);
-		if (tNear.y > tFar.y) std::swap(tNear.y, tFar.y);
+		sf::Vector2f t_near = (targetPos - ray_origin) / ray_dir;
+		sf::Vector2f t_far = (targetPos + targetSize - ray_origin) / ray_dir;
 
-		if (tNear.x > tFar.y || tNear.y > tFar.x) return;
+		if (std::isnan(t_far.y) || std::isnan(t_far.x) || std::isnan(t_near.y) || std::isnan(t_near.x)) return;
 
-		tHitNear = std::max(tNear.x, tNear.y);
-		float tHitFar = std::min(tFar.x, tFar.y);
+		if (t_near.x > t_far.x) std::swap(t_near.x, t_far.x);
+		if (t_near.y > t_far.y) std::swap(t_near.y, t_far.y);
 
-		if (tHitFar <= 0) return;
+		if (t_near.x > t_far.y || t_near.y > t_far.x) return;
 
+		float contact_time = std::max(t_near.x, t_near.y);
+		float t_hit_far = std::min(t_far.x, t_far.y);
 
-		contactPoint = lastPos + tHitNear * movementVector;
+		if (contact_time < 0.0f || contact_time >= 1.0f) return;
+		if (t_hit_far < 0) return;
 
-		if (tNear.x > tNear.y)
-			contactNormal = { 1, 0 };
-			
-		else if (tNear.x < tNear.y)
-			contactNormal = { 0, 1 };
-			
-		// add rect to std::vector of colliding platforms
-		if (tHitNear <= 1.0f)
-			collidingPlatforms.push_back(Collision(&target, tHitNear, contactNormal, contactPoint));
+		sf::Vector2f contact_normal;
+		if (t_near.x > t_near.y)
+			if (1.0f / ray_dir.x < 0.0f)
+				contact_normal = { 1.0f, 0.0f };
+			else
+				contact_normal = { -1.0f, 0.0f };
+		else if (t_near.x < t_near.y)
+			if (1.0f / ray_dir.y < 0.0f)
+				contact_normal = { 0.0f, 1.0f };
+			else
+				contact_normal = { 0.0f, -1.0f };
+		else
+			contact_normal = { 0.0f, 0.0f };
+
+		if (resolve) this->vel += contact_normal * sf::Vector2f(std::abs(this->vel.x), std::abs(this->vel.y)) * (1 - contact_time);
+		else collisions.push_back({ &_target, contact_time });
+	}
+
+	void resolveCollisions(const float deltaTime) {
+		std::sort(collisions.begin(), collisions.end(), [](const std::pair<const Platform*, float>& a, const std::pair<const Platform*, float>& b) { return a.second < b.second; });
+		for (unsigned int i = 0; i < collisions.size(); i++)
+			checkCollision(deltaTime, *collisions[i].first, true);
+	}
+
+	const sf::Vector2f& getPosition() {
+		return pos;
 	}
 
 };

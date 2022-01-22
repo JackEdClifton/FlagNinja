@@ -2,39 +2,53 @@
 
 #include <chrono>
 #include <fstream>
+#include <thread>
 
 class Timer {
 
-	float startTime = 0.0f;
-	float currentTime = 0.0f;
+	double startTime = 0.0;
+	double currentTime = 0.0;
+	float deltaTime = 0.0f;
 
-	static float getTime() {
-		return float(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count()) / 100000000.0f;
+	std::chrono::steady_clock::duration lastFrameTime;
+	std::chrono::steady_clock::duration currentFrameTime;
+
+	std::chrono::steady_clock::duration getTime(void* _) {
+		return std::chrono::high_resolution_clock::now().time_since_epoch();
+	}
+
+	double getTime() {
+		return double(std::chrono::duration_cast<std::chrono::microseconds>
+			(std::chrono::high_resolution_clock::now().time_since_epoch()).count()) / 1000000.0;
 	}
 
 public:
-	float deltaTime = 0.0f;
 
-	Timer() {
-		startTime = getTime();
-		currentTime = getTime();
-	}
+	Timer() { startTime = currentTime = float(getTime()); }
 
+	const float& getDeltaTime() { return deltaTime; };
 
 	void update() {
 		currentTime = getTime();
-		deltaTime = currentTime - startTime;
+		deltaTime = float(currentTime - startTime);
 		startTime = currentTime;
+	}
+
+	void update(void*) {
+		currentFrameTime = getTime(nullptr);
+		deltaTime = float((currentFrameTime - lastFrameTime).count() / 1000000000.0);
+		lastFrameTime = currentFrameTime;
 	}
 
 };
 
 
-#include <iostream>
 class Game {
 
 	std::vector<Player> players;
 	std::vector<Platform> platforms;
+
+	sf::Vector2f cameraDisplacement = sf::Vector2f(0.0f, 0.0f);
 
 public:
 
@@ -64,8 +78,7 @@ public:
 				// handle each character
 				if (chr == ' ') continue;
 				else if (chr == 'x') platforms.push_back(Platform(x, y, "./assets/floorTile.psd"));
-				else if (chr == 'p') { players.push_back(Player("./assets/player.psd", x + 10, y)); std::cout << x+10 << " " << y << std::endl; }
-
+				else if (chr == 'p') players.push_back(Player("./assets/player.psd", x + 10, y));
 			}
 			y += step;
 		}

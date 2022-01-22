@@ -33,6 +33,7 @@
   <ItemGroup>
     <None Include="assets\floorTile.psd" />
     <None Include="assets\player.psd" />
+    <None Include="assets\player_right_1.psd" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\maps\0.txt" />

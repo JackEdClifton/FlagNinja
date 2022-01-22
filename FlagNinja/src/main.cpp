@@ -9,28 +9,32 @@
 #include "game.h"
 
 
+
 int main() {
 
-	sf::RenderWindow window(sf::VideoMode(1200, 800), "Title");
-	Game game;
 
+	sf::RenderWindow window(sf::VideoMode(1200, 800), "Flag Ninja");
+	std::cout << "Flag Ninja!\n";
+	window.setFramerateLimit(60);
+
+	Game game;
+	std::cout << std::fixed;
+
+	auto x = game.getPlayers()[0].getPosition();
+	std::cout << x.x << " " << x.y << std::endl;
 
 	// mainloop
 	while (window.isOpen()) {
 
-		for (auto& player : game.getPlayers())
-			if (abs(player.getPosition().x) > 1000.0f || abs(player.getPosition().y) > 1000.0f)
-				std::cout << "Absurd Position:  " << player.getPosition().x << ", " << player.getPosition().y << std::endl;
-
+		// events
 		sf::Event sfEvent;
 		while (window.pollEvent(sfEvent)) {
-
 			if (sfEvent.type == sf::Event::Closed)
 				window.close();
 		}
 
-		// update objects
-		game.timer.update();
+		// update game objects
+		game.timer.update(nullptr);
 
 		// handle floor stuff
 		for (auto& platform : game.getPlatforms()) {
@@ -39,12 +43,15 @@ int main() {
 
 		// handle player stuff
 		for (auto& player : game.getPlayers()) {
-			player.update(game.timer.deltaTime);
-
-			for (auto& platform : game.getPlatforms())
-				player.checkCollision(platform);
-			
+			player.handleInput(game.timer.getDeltaTime());
+			player.updatePhysics(game.timer.getDeltaTime());
 			window.draw(player);
+			for (auto& platform : game.getPlatforms())
+				player.checkCollision(game.timer.getDeltaTime(), platform);
+			player.resolveCollisions(game.timer.getDeltaTime());
+			player.update(game.timer.getDeltaTime());
+
+			std::cout << (int)player.getPosition().x << ", " << (int)player.getPosition().y << std::endl;
 		}
 
 
