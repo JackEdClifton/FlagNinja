@@ -166,6 +166,7 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\entity.h" />
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\platform.h" />
     <ClInclude Include="src\player.h" />

@@ -29,12 +29,6 @@ public:
 	const float& getDeltaTime() { return deltaTime; };
 
 	void update() {
-		currentTime = getTime();
-		deltaTime = float(currentTime - startTime);
-		startTime = currentTime;
-	}
-
-	void update(void*) {
 		currentFrameTime = getTime(nullptr);
 		deltaTime = float((currentFrameTime - lastFrameTime).count() / 1000000000.0);
 		lastFrameTime = currentFrameTime;
