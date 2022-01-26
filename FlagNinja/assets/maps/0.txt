@@ -1,8 +1,18 @@
 
 
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-x                           x                     
-x  p                        x      xxxxx  x       
-x        xxx        xx      x  xx xxx      xx     
-x                           xxxx          xxx     
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+                            gg
+                    g              ggggg  g                       g                                             
+          gg        d          gg gdd      gg                      g                                            
+     p                      gggd          gdd                      d                                            
+d  gggggggggggggggggggggggggggggggggggggggggggggggg              g d                                            
+d               d         d                           g       ggg                                               
+dggggggggg  g   d                        g      g    g                                                          
+d        d  d         gg     gg     gg   g           d                                                          
+d ggggg     d g                             gg       d                                                          
+    d dgggggg    ggggg                                                                                          
+    d                    gg     ggggg   gggg   gggg   ggggg   g                                                 
+          g        ggggggd                        d g     d   d                                                 
+gg        dggggggggd                               g      d   dggggggggg                                        
+                                                          d            d                                        
+                                                          dggggggggggggd                                        

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <Windows.h>
+#include "platform.h"
 
 // override devision operator
 sf::Vector2f operator/(sf::Vector2f a, sf::Vector2f b) {
@@ -22,49 +23,80 @@ sf::Vector2f operator*(sf::Vector2f a, sf::Vector2f b) {
 class Entity : public sf::Sprite {
 
 protected:
+	sf::Texture texture = sf::Texture();
 	sf::Vector2f pos;
 	sf::Vector2f size;
 	sf::Vector2f vel = sf::Vector2f(0.0f, 0.0f);
 	std::vector<std::pair<const Platform*, float>> collisions;
 
-	const float gravity = 200.0f;
+	const float gravity = 640.0f;
 	const float drag = 1.0f - 0.2f;
 	const float maxVel = 400.0f;
-	const float jumpVel = -200.0f;
+	const float jumpVel = -220.0f;
 
 	bool controlsActive = true;
+	bool onFloor = false;
+	short maxJumps = 2;
+	short jumps = 0;
+	float jumpCooldown = 0.0f;
+
+	short animation = 1;
+	float animationCooldown = 0.0f;
+	float animationMaxCooldown = 0.1f;
 
 public:
 
 	// constructor
 	Entity(const char* texturePath, float xPos = 0.0f, float yPos = 0.0f) {
-
 		pos = { xPos, yPos };
 
 		// handle texture
-		sf::Texture* texture = new sf::Texture();
-		texture->loadFromFile(texturePath);
-		setTexture(*texture);
+		texture.loadFromFile(texturePath);
+		setTexture(texture);
 		size = sf::Vector2f(getTexture()->getSize());
 	}
 
-
-	// handle position
+	// update variables
 	void update(float deltaTime) {
 		// move player
 		pos += vel * deltaTime;
 		setPosition({ pos });
+
+		// handle jump physics
+		if (onFloor)
+			jumps = maxJumps;
+		onFloor = false;
+		jumpCooldown = std::max(0.0f, jumpCooldown - deltaTime);
+
+		// change animation
+		if (abs(vel.x) > 0.1f) {
+			if (animationCooldown > 0.0f) {
+				animationCooldown -= deltaTime;
+				return;
+			}
+			animationCooldown = animationMaxCooldown;
+			animation += 1;
+			if (animation > 2) animation = 1;
+			std::string path = "./assets/player_right_";
+			texture.loadFromFile(path + std::to_string(animation) + ".psd");
+			setTexture(texture);
+			size = sf::Vector2f(getTexture()->getSize());
+		}
+		else {
+			texture.loadFromFile("./assets/player.psd");
+			setTexture(texture);
+			size = sf::Vector2f(getTexture()->getSize());
+		}
 	}
 
-
-	void checkCollision(const float deltaTime, const Platform& _target, const bool resolve = false) {
+	void checkCollision(const float deltaTime, const Platform& target, const bool resolve = false) {
 
 		// check rect is moving
 		if (this->vel.x == 0 && this->vel.y == 0) return;
 
 		// expand player rect
-		sf::Vector2f targetPos = _target.getPosition();
-		sf::Vector2f targetSize = sf::Vector2f(_target.getTexture()->getSize());
+		sf::Vector2f targetPos = target.getPosition();
+		sf::Vector2f targetSize = sf::Vector2f(target.getTexture()->getSize());
 
 		targetPos -= this->size / 2.0f;
 		targetSize += this->size;
@@ -102,8 +134,17 @@ public:
 		else
 			contact_normal = { 0.0f, 0.0f };
 
-		if (resolve) this->vel += contact_normal * sf::Vector2f(std::abs(this->vel.x), std::abs(this->vel.y)) * (1 - contact_time);
-		else collisions.push_back({ &_target, contact_time });
+		// resolve collision
+		if (resolve) {
+			this->vel += contact_normal * sf::Vector2f(std::abs(this->vel.x), std::abs(this->vel.y)) * (1 - contact_time);
+			
+			if (contact_normal.y == -1.0f)
+				onFloor = true;
+		}
+
+		// save collision for later
+		else
+			collisions.push_back({ &target, contact_time });
 	}
 
 	void resolveCollisions(const float deltaTime) {
@@ -112,8 +153,7 @@ public:
 			checkCollision(deltaTime, *collisions[i].first, true);
 	}
 
-	const sf::Vector2f& getPosition() {
-		return pos;
+	void cameraMoveBy(sf::Vector2f camera) {
+		pos += camera;
 	}
-
 };

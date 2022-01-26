@@ -6,7 +6,6 @@
 
 class Player : public Entity {
 
-	bool controlsActive = true;
 	
 public:
 
@@ -16,20 +15,21 @@ public:
 	// handle user input
 	void handleInput(float deltaTime) {
 		
-		// reset position, for debugging purposes
-		if (GetAsyncKeyState('Q')) pos = { 0.0f, 0.0f };
-		
 		// x axis input
 		if (GetAsyncKeyState('A')) { vel.x = -maxVel; }
 		if (GetAsyncKeyState('D')) { vel.x = maxVel; }
+		if (GetAsyncKeyState('S')) { vel.y = maxVel; }
 
 		// jump input
-		if ((GetAsyncKeyState('W') || GetAsyncKeyState(' ')))
+		if ((GetAsyncKeyState('W') || GetAsyncKeyState(' ')) && jumps && !jumpCooldown) {
 			vel.y = jumpVel;
+			jumps -= 1;
+			jumpCooldown = 0.2f;
+		}
 
 		// drag & gravity
 		vel.x *= drag;
-		vel.y += gravity * deltaTime;
+		vel.y += (vel.y < 0.0f ? 0.5f : 1.0f) * gravity * deltaTime;
 	}
 
 

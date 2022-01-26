@@ -37,6 +37,9 @@
     <None Include="assets\floorTile.psd" />
     <None Include="assets\player.psd" />
     <None Include="assets\player_right_1.psd" />
+    <None Include="assets\grass.psd" />
+    <None Include="assets\dirt.psd" />
+    <None Include="assets\player_right_2.psd" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\maps\0.txt" />
