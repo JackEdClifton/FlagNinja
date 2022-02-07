@@ -96,8 +96,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x86\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x86\include;$(ProjectDir)header</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -114,8 +115,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x86\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x86\include;$(ProjectDir)header</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -132,8 +134,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SFML_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x64\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x64\include;$(ProjectDir)header</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,8 +153,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SFML_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x64\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x64\include;$(ProjectDir)header</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExceptionHandling>Sync</ExceptionHandling>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -163,24 +167,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\entity.cpp" />
+    <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\textures.cpp" />
+    <ClCompile Include="src\sfmlExtension.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\entity.h" />
-    <ClInclude Include="src\game.h" />
-    <ClInclude Include="src\platform.h" />
-    <ClInclude Include="src\player.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="assets\dirt.psd" />
-    <None Include="assets\floorTile.psd" />
-    <None Include="assets\grass.psd" />
-    <None Include="assets\player.psd" />
-    <None Include="assets\player_right_1.psd" />
-    <None Include="assets\player_right_2.psd" />
+    <ClInclude Include="header\entity.h" />
+    <ClInclude Include="header\game.h" />
+    <ClInclude Include="header\gun.h" />
+    <ClInclude Include="header\platform.h" />
+    <ClInclude Include="header\player.h" />
+    <ClInclude Include="header\sfmlExtension.h" />
+    <ClInclude Include="header\textuers.h" />
+    <ClInclude Include="header\timer.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\maps\0.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\guns\pistol.psd" />
+    <None Include="assets\player\default.psd" />
+    <None Include="assets\player\player_1.psd" />
+    <None Include="assets\player\player_2.psd" />
+    <None Include="assets\world\dirt.psd" />
+    <None Include="assets\world\floorTile.psd" />
+    <None Include="assets\world\grass.psd" />
+    <None Include="assets\world\grass_2.psd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -18,30 +18,56 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sfmlExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\textures.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\player.h">
+    <ClInclude Include="header\player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\platform.h">
+    <ClInclude Include="header\platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\game.h">
+    <ClInclude Include="header\game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\entity.h">
+    <ClInclude Include="header\entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="assets\floorTile.psd" />
-    <None Include="assets\player.psd" />
-    <None Include="assets\player_right_1.psd" />
-    <None Include="assets\grass.psd" />
-    <None Include="assets\dirt.psd" />
-    <None Include="assets\player_right_2.psd" />
+    <ClInclude Include="header\gun.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="header\timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="header\sfmlExtension.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="header\textuers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\maps\0.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\player\default.psd" />
+    <None Include="assets\player\player_1.psd" />
+    <None Include="assets\player\player_2.psd" />
+    <None Include="assets\world\grass_2.psd" />
+    <None Include="assets\world\dirt.psd" />
+    <None Include="assets\world\floorTile.psd" />
+    <None Include="assets\world\grass.psd" />
+    <None Include="assets\guns\pistol.psd" />
   </ItemGroup>
 </Project>
