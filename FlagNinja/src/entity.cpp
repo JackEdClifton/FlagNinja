@@ -14,7 +14,7 @@ Entity::Entity(std::string folderName, float xPos = 0.0f, float yPos = 0.0f) {
 }
 
 void Entity::initTextures(std::string folderName) {
-	return;
+	
 	// handle texture
 	textures[0].loadFromFile("./assets/" + folderName + "/default.psd");
 	textures[1].loadFromFile("./assets/" + folderName + "/player_1.psd");
