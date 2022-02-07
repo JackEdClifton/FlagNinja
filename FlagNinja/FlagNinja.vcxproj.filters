@@ -30,32 +30,21 @@
     <ClCompile Include="src\textures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="header\player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="header\platform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="header\game.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="header\entity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="header\gun.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="header\timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="header\sfmlExtension.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="header\textuers.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="src\timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\platform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gun.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\maps\0.txt" />
@@ -64,10 +53,39 @@
     <None Include="assets\player\default.psd" />
     <None Include="assets\player\player_1.psd" />
     <None Include="assets\player\player_2.psd" />
-    <None Include="assets\world\grass_2.psd" />
     <None Include="assets\world\dirt.psd" />
+    <None Include="assets\guns\pistol.psd" />
+    <None Include="assets\guns\bullet.psd" />
     <None Include="assets\world\floorTile.psd" />
     <None Include="assets\world\grass.psd" />
-    <None Include="assets\guns\pistol.psd" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="hdr\entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\gun.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\sfmlExtension.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\textuers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

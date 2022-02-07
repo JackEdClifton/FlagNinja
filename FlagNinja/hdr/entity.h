@@ -1,8 +1,5 @@
-// source: https://www.youtube.com/watch?v=8JJ-4JgR7Dg
-
 #pragma once
 
-#include "platform.h"
 
 class Entity : public sf::Sprite {
 
@@ -43,7 +40,7 @@ protected:
 public:
 
 	// constructor
-	Entity(std::string folderName, float xPos, float yPos);
+	Entity(float xPos, float yPos, std::string folderName);
 
 	void initTextures(std::string folderName);
 

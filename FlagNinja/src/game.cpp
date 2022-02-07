@@ -1,16 +1,12 @@
 #pragma once
 
-#include <chrono>
-#include <fstream>
-#include <thread>
-#include <vector>
 
-#include "SFML/Graphics.hpp"
+#include "pch.h"
 
-#include "player.h"
 #include "platform.h"
-#include "entity.h"
 #include "gun.h"
+#include "entity.h"
+#include "player.h"
 #include "timer.h"
 
 #include "game.h"
@@ -79,11 +75,10 @@ void Game::readMap(int num) {
 
 			// handle each character
 			if (chr == ' ') continue;
-			else if (chr == 'x') platforms.push_back(new Platform(x, y, "floorTile"));
-			else if (chr == 'g') platforms.push_back(new Platform(x, y, "grass_2"));
-			else if (chr == 'd') platforms.push_back(new Platform(x, y, "grass_2"));
-			else if (chr == 'p') players.push_back(new Player("player", x + 10, y));
-			y = y + 1 - 1;
+			else if (chr == 'x') platforms.push_back(new Platform(x, y, Textures::Grass));
+			else if (chr == 'g') platforms.push_back(new Platform(x, y, Textures::Grass));
+			else if (chr == 'd') platforms.push_back(new Platform(x, y, Textures::Dirt));
+			else if (chr == 'p') players.push_back(new Player(x + 10, y, "player"));
 		}
 		y += step;
 	}
@@ -128,14 +123,24 @@ void Game::update() {
 	mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
 	players[0]->handleInput(timer.getDeltaTime(), mousePosition);
-	int index = 0;
+	int index = -1;
 	for (auto& bullet : bullets) {
-		bullet->update(timer.getDeltaTime());
-		if (bullet->bulletTimeout(timer.getDeltaTime()) && false) {
-			bullets[index] = bullets[bullets.size() - 1];
-			bullets.pop_back();
-		}
+
 		index++;
+		bullet->update(timer.getDeltaTime());
+
+		if (bullet->bulletTimeout(timer.getDeltaTime()))
+			goto destroyBullet;
+
+		for (auto& platform : platforms) {
+			if (bullet->isColliding(*platform))
+				goto destroyBullet;
+		}
+
+		continue;
+	destroyBullet:
+		bullets[index] = bullets[bullets.size() - 1];
+		bullets.pop_back();
 	}
 }
 
@@ -149,7 +154,7 @@ void Game::handleSfmlEvents() {
 			window.close();
 
 		// shooting button
-		if (sfEvent.type == sf::Event::MouseButtonPressed)
+		if (sfEvent.type == sf::Event::MouseButtonPressed && sfEvent.mouseButton.button == sf::Mouse::Left)
 			bullets.push_back(new Bullet(players[0]->getPosition(), players[0]->getGun().getUnitVector(), players[0]->getGun().getRotation()));
 	}
 }

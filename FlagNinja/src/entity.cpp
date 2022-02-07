@@ -1,18 +1,17 @@
 
-#include "SFML/Graphics.hpp"
+#include "pch.h"
 
-#include "sfmlExtension.h"
-#include "textuers.h"
 #include "platform.h"
 #include "entity.h"
 
 
 // constructor
-Entity::Entity(std::string folderName, float xPos = 0.0f, float yPos = 0.0f) {
+Entity::Entity(float xPos, float yPos, std::string folderName) {
 	pos = { xPos, yPos };
 	initTextures(folderName);
 }
 
+// load textures
 void Entity::initTextures(std::string folderName) {
 	
 	// handle texture
@@ -26,7 +25,6 @@ void Entity::initTextures(std::string folderName) {
 	scale(scaleFactor);
 	size = sf::Vector2f(getTexture()->getSize()) * scaleFactor;
 }
-
 
 // update variables
 void Entity::updateMovement(float deltaTime) {
