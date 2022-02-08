@@ -1,18 +1,16 @@
 
-
-
-                            gg
-                    g              ggggg  g                       g                                             
-          gg        d          gg gdd      gg                      g                                            
-     p                      gggd          gdd                      d                                            
-g  gggggggggggggggggggggggggddddggggggggggdddgggggg              g d                                            
-d               d         d                           g       ggg                                               
-dggggggggg  g   d                        g      g    g                                                          
-d        d  d         gg     gg     gg   g           d                                                          
-d ggggg     d g                             gg       d                 g                                        
-    d dgggggd    ggggg                                                 d                                        
-    d                    gg     ggggg   gggg   gggg   ggggg   g        d                                        
-          g        ggggggd                        d g     d   d        d                                        
-gg        dggggggggd                               g      d   dggggg ggd                                        
- d         d                                              d            d                                        
- dgggggggggdggd                                           dggggggggggggd                                        
+g                           gg
+d                   g              ggggg  g                       g          
+d         gg        d          gg gdd      gg                      g         
+d    p                      gggd          gdd                      d         
+d  gggggggggggggggggggggggggddddggggggggggdddgggggg              g d         
+d                d                                    g       ggg            
+dggggggggg  g              g                         g                       
+d        d  d         gg     gg     gg      g    g   d                       
+d ggggg     d g                             dg       d                 g     
+d   d dgggggd     gggg                                                 d     
+d   d                     g      gggg   gggg   gggg   ggggg   g        d     
+d         g        ggggggdd                   g   dggd    d   d        d     
+dg        dggggggggdddddddd              gggggd           d   dggggg ggd     
+dd         d              dg        gggggd                d          f d     
+ddgggggggggd               dggggggggd                     dggggggggggggd     

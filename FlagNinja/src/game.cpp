@@ -17,6 +17,7 @@ Game::Game() {
 	readMap(0);
 }
 
+// destructor
 Game::~Game() {
 	for (auto& obj : players) delete obj;
 	for (auto& obj : platforms) delete obj;
@@ -24,18 +25,23 @@ Game::~Game() {
 }
 
 // getters
-std::vector<Player*>& Game::getPlayers() { return players; }
-const std::vector<Platform*>& Game::getPlatforms() { return platforms; }
+std::vector<Player*>& Game::getPlayers() {
+	return players;
+}
+const std::vector<Platform*>& Game::getPlatforms() {
+	return platforms;
+}
 
+// move all objects so player fits in window
 void Game::adjustCameraPosition() {
 
 	// get positions and sizes
-	auto player = (*players[0]).getPosition();
-	auto display = sf::Vector2f(window.getSize());
-	sf::Vector2f idk = display / 1.2f;
+	sf::Vector2f player = players[0]->getPosition();
+	sf::Vector2f display = sf::Vector2f(window.getSize());
+	sf::Vector2f safezone = display / 1.2f;
 
-	player -= idk / 2.0f;
-	display -= idk;
+	player -= safezone / 2.0f;
+	display -= safezone;
 
 	sf::Vector2f camera = { 0.0f, 0.0f };
 
@@ -49,6 +55,7 @@ void Game::adjustCameraPosition() {
 	else if (player.y < 0.0f)
 		camera.y = -player.y;
 
+	overallCameraDisplacement += camera;
 
 	for (auto& player : players)
 		player->cameraMoveBy(camera);
@@ -58,7 +65,7 @@ void Game::adjustCameraPosition() {
 		if (bullet) bullet->move(camera);
 }
 
-// read and load map file
+// load a map from a file
 void Game::readMap(int num) {
 	std::string line;
 	std::ifstream file("./assets/maps/" + std::to_string(num) + ".txt");
@@ -85,21 +92,8 @@ void Game::readMap(int num) {
 	file.close();
 }
 
-// handle player movement
-void Game::handlePlayers() {
-	for (auto& player : players) {
-
-		for (auto& platform : platforms)
-			player->checkCollision(timer.getDeltaTime(), *platform);
-
-		player->resolveCollisions(timer.getDeltaTime());
-		player->updateMovement(timer.getDeltaTime());
-		player->updateAnimation(timer.getDeltaTime());
-	}
-}
-
 // draw objects
-void Game::drawObjects() {
+void Game::drawAllObjects() {
 	adjustCameraPosition();
 
 	for (auto& platform : platforms)
@@ -117,29 +111,43 @@ void Game::drawObjects() {
 	window.clear(sf::Color(30, 50, 240));
 }
 
-// update values
-void Game::update() {
+// update object values
+void Game::updateAllObjects() {
+
+	// game
 	timer.update();
 	mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
+	// players
 	players[0]->handleInput(timer.getDeltaTime(), mousePosition);
-	int index = -1;
-	for (auto& bullet : bullets) {
+	for (auto& player : players) {
+		
+		for (auto& platform : platforms)
+			player->checkCollision(timer.getDeltaTime(), *platform);
 
-		index++;
-		bullet->update(timer.getDeltaTime());
+		player->resolveCollisions(timer.getDeltaTime());
+		player->updateMovement(timer.getDeltaTime());
+		player->updateAnimation(timer.getDeltaTime());
+	}
 
-		if (bullet->bulletTimeout(timer.getDeltaTime()))
+	// bullets
+	for (unsigned int i = 0; i < bullets.size(); i++) {
+
+		bullets[i]->update(timer.getDeltaTime());
+
+		// check if bullet has exited for too long
+		if (bullets[i]->bulletTimeout(timer.getDeltaTime()))
 			goto destroyBullet;
 
+		// check if bullet has collided with anything
 		for (auto& platform : platforms) {
-			if (bullet->isColliding(*platform))
+			if (bullets[i]->isColliding(*platform))
 				goto destroyBullet;
 		}
 
 		continue;
 	destroyBullet:
-		bullets[index] = bullets[bullets.size() - 1];
+		bullets[i] = bullets[bullets.size() - 1];
 		bullets.pop_back();
 	}
 }

@@ -23,9 +23,8 @@ int main() {
 		game.handleSfmlEvents();
 
 		// update game objects
-		game.update();
-		game.handlePlayers();
-		game.drawObjects();
+		game.updateAllObjects();
+		game.drawAllObjects();
 
 	}
 

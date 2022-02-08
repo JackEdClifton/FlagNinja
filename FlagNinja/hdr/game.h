@@ -7,7 +7,7 @@ class Game {
 	std::vector<Platform*> platforms;
 	std::vector<Bullet*> bullets;
 
-	sf::Vector2f cameracamera = sf::Vector2f(0.0f, 0.0f);
+	sf::Vector2f overallCameraDisplacement = { 0.0f, 0.0f };
 	sf::Vector2f mousePosition;
 
 public:
@@ -24,8 +24,7 @@ public:
 
 	void adjustCameraPosition();
 	void readMap(int num);  // read and load map file
-	void handlePlayers();   // handle player movement
-	void drawObjects();     // draw objects
-	void update();  // update values
+	void drawAllObjects();     // draw objects
+	void updateAllObjects();  // update position and attributes of objects
 	void handleSfmlEvents();  // handle sfml specific events
 };

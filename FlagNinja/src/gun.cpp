@@ -57,10 +57,11 @@ bool Bullet::bulletTimeout(float deltaTime) {
 }
 
 bool Bullet::isColliding(const sf::Sprite& target) {
-	sf::Vector2f thisPos = (sf::Vector2f)this->getTexture()->getSize();
+	sf::Vector2f thisPos = (sf::Vector2f)this->getPosition();
+	sf::Vector2f thisSize = (sf::Vector2f)(this->getTexture()->getSize());
 
-	sf::Vector2f targetPos = target.getPosition();
-	sf::Vector2f targetSize = (sf::Vector2f)(target.getTexture()->getSize());
+	sf::Vector2f targetPos = target.getPosition() - thisSize;
+	sf::Vector2f targetSize = (sf::Vector2f)(target.getTexture()->getSize()) + thisSize;
 
 	return (thisPos.x > targetPos.x) && (thisPos.x < targetPos.x + targetSize.x)
 		&& (thisPos.y > targetPos.y) && (thisPos.y < targetPos.y + targetSize.y);
