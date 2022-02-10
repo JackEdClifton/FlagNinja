@@ -1,18 +1,16 @@
 #pragma once
 
+#include "entity.h"
+
 
 class Player : public Entity {
-	Gun gun = Gun("./assets/guns/pistol.psd");
+protected:
+	sf::Vector2f scaleFactor = { 0.69f, 0.69f };
 	
 public:
-
-	// getter
-	const Gun& getGun();
 	
 	// constructor
-	Player(float xPos, float yPos, std::string texturePath);
-
-	// handle user input
-	void handleInput(const float deltaTime, const sf::Vector2f& mousePos);
-
+	Player(float xPos, float yPos);
+	void initTextures() override;
+	void update(float deltaTime, const sf::Vector2f& mousePosition);
 };

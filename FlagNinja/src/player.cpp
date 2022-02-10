@@ -1,41 +1,28 @@
-#pragma once
 
 #include "pch.h"
-#include <Windows.h>
-
-#include "platform.h"
-#include "entity.h"
-#include "gun.h"
-
 #include "player.h"
 
 
-// getter
-const Gun& Player::getGun() { return gun; }
-
 // constructor
-Player::Player(float xPos, float yPos, std::string texturePath) : Entity(xPos, yPos, texturePath) {}
+Player::Player(float xPos, float yPos) : Entity(xPos, yPos) {
+	initTextures();
+}
 
-// handle user input
-void Player::handleInput(const float deltaTime, const sf::Vector2f& mousePos) {
+void Player::initTextures() {
+	textures[0] = Textures::Player_0;
+	textures[1] = Textures::Player_1;
+	textures[2] = Textures::Player_2;
+	textures[3] = Textures::Player_3;
+	textures[4] = Textures::Player_4;
 
-	// x axis input
-	if (GetAsyncKeyState('A')) { vel.x = -maxVel; }
-	if (GetAsyncKeyState('D')) { vel.x = maxVel; }
-	if (GetAsyncKeyState('S')) { vel.y = maxVel; }
+	setTexture(*textures[0]);
+	scale(scaleFactor);
+	size = sf::Vector2f(getTexture()->getSize()) * scaleFactor;
+}
 
-	// jump input
-	if ((GetAsyncKeyState('W') || GetAsyncKeyState(' ')) && jumps && !jumpCooldown) {
-		vel.y = jumpVel;
-		jumps -= 1;
-		jumpCooldown = 0.2f;
-	}
+void Player::update(float deltaTime, const sf::Vector2f& mousePosition) {
+	Entity::update(deltaTime);
 
-	// drag & gravity
-	vel.x *= drag;
-	vel.y += (vel.y < 0.0f ? 0.5f : 1.0f) * gravity * deltaTime;
-
-	// weapon
-	gun.setPosition(pos + size / 2.0f);
-	gun.aimWeapon(mousePos);
+	gun.setPosition(getPosition() + size / sf::Vector2f(2.0f, 5.0f));
+	gun.aimTowards(mousePosition);
 }

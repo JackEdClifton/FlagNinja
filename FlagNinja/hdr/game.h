@@ -1,30 +1,54 @@
 #pragma once
 
+#include "timer.h"
+#include "player.h"
+#include "bullet.h"
+#include "enemy.h"
+#include "coin.h"
+#include "flag.h"
+#include "staticEntity.h"
+
+namespace window {
+	extern const char* title;
+	extern unsigned int width;
+	extern unsigned int height;
+	extern unsigned int style;
+}
 
 class Game {
-
-	std::vector<Player*> players;
-	std::vector<Platform*> platforms;
-	std::vector<Bullet*> bullets;
-
 	sf::Vector2f overallCameraDisplacement = { 0.0f, 0.0f };
 	sf::Vector2f mousePosition;
 
-public:
+	int score = 0;
 
-	Timer timer;
-	sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(1200, 800), "Flag Ninja");
+	void readMap(int num);  // read and load map file
+	void adjustCamera();  // move all drawable objects to keep player within window
+	void resetCamera();
+	void moveObjects(const sf::Vector2f& displacement);
+	void drawObjects();  // draw objects
+	void drawUI();  // draw user interface
+
+public:
 
 	Game();
 	~Game();
 
-	// getters for object arrays
-	std::vector<Player*>& getPlayers();
-	const std::vector<Platform*>& getPlatforms();
+	sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(window::width, window::height), window::title, window::style);
+	Timer timer;
+	const float& deltaTime = timer.getDeltaTime();
 
-	void adjustCameraPosition();
-	void readMap(int num);  // read and load map file
-	void drawAllObjects();     // draw objects
-	void updateAllObjects();  // update position and attributes of objects
-	void handleSfmlEvents();  // handle sfml specific events
+	// drawable objects
+	std::vector<Player> players;
+	std::vector<Enemy> enemies;
+	std::vector<Bullet*> bullets;
+	std::vector<StaticEntity> platforms;
+	std::vector<Coin> coins;
+	Flag flag;
+
+	// abstract game functions
+	void updateDisplay();
+	void updateGameAttributes(); // update timer and mouse values
+	void handleCollisions();  // handle collisions for all collidable objects
+	void updateEntitys(); // apply velocity
+	void handleInput();  // and window update position and attributes of objects
 };

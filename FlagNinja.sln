@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlagNinja", "FlagNinja\FlagNinja.vcxproj", "{52903163-5282-41E4-A20B-E7433565A435}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PerformanceProfiler", "PerformanceProfiler\PerformanceProfiler.vcxproj", "{FEE0C468-6B65-419A-B5B4-16C15F4AF2E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{52903163-5282-41E4-A20B-E7433565A435}.Release|x64.Build.0 = Release|x64
 		{52903163-5282-41E4-A20B-E7433565A435}.Release|x86.ActiveCfg = Release|Win32
 		{52903163-5282-41E4-A20B-E7433565A435}.Release|x86.Build.0 = Release|Win32
+		{FEE0C468-6B65-419A-B5B4-16C15F4AF2E5}.Debug|x64.ActiveCfg = Debug|x64
+		{FEE0C468-6B65-419A-B5B4-16C15F4AF2E5}.Debug|x64.Build.0 = Debug|x64
+		{FEE0C468-6B65-419A-B5B4-16C15F4AF2E5}.Debug|x86.ActiveCfg = Debug|Win32
+		{FEE0C468-6B65-419A-B5B4-16C15F4AF2E5}.Debug|x86.Build.0 = Debug|Win32
+		{FEE0C468-6B65-419A-B5B4-16C15F4AF2E5}.Release|x64.ActiveCfg = Release|x64
+		{FEE0C468-6B65-419A-B5B4-16C15F4AF2E5}.Release|x64.Build.0 = Release|x64
+		{FEE0C468-6B65-419A-B5B4-16C15F4AF2E5}.Release|x86.ActiveCfg = Release|Win32
+		{FEE0C468-6B65-419A-B5B4-16C15F4AF2E5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,5 @@
 
 #include "pch.h"
-
 #include "timer.h"
 
 
@@ -19,6 +18,7 @@ Timer::Timer() { startTime = currentTime = float(getTime()); }
 const float& Timer::getDeltaTime() { return deltaTime; };
 
 void Timer::update() {
+	PROFILE;
 	currentFrameTime = getTime(nullptr);
 	deltaTime = float((currentFrameTime - lastFrameTime).count() / 1000000000.0);
 	lastFrameTime = currentFrameTime;

@@ -1,8 +1,5 @@
 
-#include <iostream>
 #include "pch.h"
-
-#include "platform.h"
 #include "gun.h"
 
 
@@ -14,10 +11,10 @@ Gun::Gun(const char* texturePath) {
 	scale(0.9f, 0.9f);
 }
 
-void Gun::aimWeapon(const sf::Vector2f& mousePos) {
+void Gun::aimTowards(const sf::Vector2f& target) {
 
 	// get direction vector from player to cursor
-	sf::Vector2f vector = mousePos - getPosition();
+	sf::Vector2f vector = target - getPosition();
 
 	// set unit vector
 	if (vector.x || vector.y)
@@ -36,33 +33,3 @@ void Gun::aimWeapon(const sf::Vector2f& mousePos) {
 }
 
 
-
-
-Bullet::Bullet(sf::Vector2f position, sf::Vector2f unitVector, float angle) {
-	setPosition(position);
-	this->unitVector = unitVector;
-	setTexture(*Textures::Bullet);
-	if (unitVector.x < 0.0f)
-		scale(-1.0f, 1.0f);
-	setRotation(angle);
-}
-
-void Bullet::update(float deltaTime) {
-	move(unitVector * speed * deltaTime);
-}
-
-bool Bullet::bulletTimeout(float deltaTime) {
-	startTime += deltaTime;
-	return startTime > timeout;
-}
-
-bool Bullet::isColliding(const sf::Sprite& target) {
-	sf::Vector2f thisPos = (sf::Vector2f)this->getPosition();
-	sf::Vector2f thisSize = (sf::Vector2f)(this->getTexture()->getSize());
-
-	sf::Vector2f targetPos = target.getPosition() - thisSize;
-	sf::Vector2f targetSize = (sf::Vector2f)(target.getTexture()->getSize()) + thisSize;
-
-	return (thisPos.x > targetPos.x) && (thisPos.x < targetPos.x + targetSize.x)
-		&& (thisPos.y > targetPos.y) && (thisPos.y < targetPos.y + targetSize.y);
-}

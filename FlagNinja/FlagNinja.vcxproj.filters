@@ -24,16 +24,10 @@
     <ClCompile Include="src\sfmlExtension.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\game.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\textures.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\platform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\gun.cpp">
@@ -45,12 +39,30 @@
     <ClCompile Include="src\pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\bullet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enemy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\coin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\staticEntity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\flag.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\maps\0.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\player\default.psd" />
+    <None Include="assets\player\player_0.psd" />
     <None Include="assets\player\player_1.psd" />
     <None Include="assets\player\player_2.psd" />
     <None Include="assets\world\dirt.psd" />
@@ -58,6 +70,14 @@
     <None Include="assets\guns\bullet.psd" />
     <None Include="assets\world\floorTile.psd" />
     <None Include="assets\world\grass.psd" />
+    <None Include="assets\world\coin_0.psd" />
+    <None Include="assets\player\player_3.psd" />
+    <None Include="assets\player\player_4.psd" />
+    <None Include="assets\enemy\enemy_1.psd" />
+    <None Include="assets\world\coin_1.psd" />
+    <None Include="assets\world\coin_2.psd" />
+    <None Include="assets\world\flag_0.psd" />
+    <None Include="assets\world\flag_1.psd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hdr\entity.h">
@@ -67,9 +87,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hdr\gun.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="hdr\platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hdr\player.h">
@@ -87,5 +104,23 @@
     <ClInclude Include="hdr\pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="hdr\bullet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\enemy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\coin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\staticEntity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\flag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\fonts\comic.ttf" />
   </ItemGroup>
 </Project>

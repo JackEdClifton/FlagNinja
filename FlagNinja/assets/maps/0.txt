@@ -1,16 +1,21 @@
 
-g                           gg
-d                   g              ggggg  g                       g          
-d         gg        d          gg gdd      gg                      g         
-d    p                      gggd          gdd                      d         
-d  gggggggggggggggggggggggggddddggggggggggdddgggggg              g d         
-d                d                                    g       ggg            
-dggggggggg  g              g                         g                       
-d        d  d         gg     gg     gg      g    g   d                       
-d ggggg     d g                             dg       d                 g     
-d   d dgggggd     gggg                                                 d     
-d   d                     g      gggg   gggg   gggg   ggggg   g        d     
-d         g        ggggggdd                   g   dggd    d   d        d     
-dg        dggggggggdddddddd              gggggd           d   dggggg ggd     
-dd         d              dg        gggggd                d          f d     
-ddgggggggggd               dggggggggd                     dggggggggggggd     
+gg                   c       gg                                    c                  gg
+dd       1           g              gg  g  g                       g                  dd
+dd   p     gg        d         ggg gd       g                       g     c           dd
+dd               c           ggdc                                   dg    g           dd
+dd  gggggggggggggggggggggggggdddgggggggggggggggggggg              g d                 dd
+dd     1          d         c                          g       ggg           g        dd
+ddggggggggg  g              g                         g                              gdd
+ddc   1   dg d         gg             g      g    g   d                     g     gggddd
+ddgggggg     d g  g            g              gg       d                 g       gdddddd
+ddc  d dgggggd                                                          gdggggggggggggdd
+dd   d                     g      gggg   gggg   gggg   ggggg   g        dddddddddddddddd
+dd         g        gggggggd                   gddddgggddddd   d        d             dd
+ddg        dggggggggdddddddd              gggggddddddddddddd   dggggg ggd          f  dd
+ddd    g   dddddddddddddddddg  c     gggggdddddddddddddddddd                dddddddddddd
+dddgggggggggdddddddddddddddddggggggggdddddddddddddddddddddddggggggggggggdddddddddddddddd
+dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
+dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd

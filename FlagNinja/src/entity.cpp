@@ -1,38 +1,17 @@
 
 #include "pch.h"
-
-#include "platform.h"
 #include "entity.h"
 
-
-// constructor
-Entity::Entity(float xPos, float yPos, std::string folderName) {
-	pos = { xPos, yPos };
-	initTextures(folderName);
+Entity::Entity(float xPos, float yPos) {
+	setPosition(xPos, yPos);
 }
 
-// load textures
-void Entity::initTextures(std::string folderName) {
-	
-	// handle texture
-	textures[0].loadFromFile("./assets/" + folderName + "/default.psd");
-	textures[1].loadFromFile("./assets/" + folderName + "/player_1.psd");
-	textures[2].loadFromFile("./assets/" + folderName + "/player_2.psd");
-	textures[3].loadFromFile("./assets/" + folderName + "/player_1.psd");
-	textures[4].loadFromFile("./assets/" + folderName + "/player_2.psd");
-
-	setTexture(textures[(int)log2<int>((int)animation)]);
-	scale(scaleFactor);
-	size = sf::Vector2f(getTexture()->getSize()) * scaleFactor;
+void Entity::applyExternalForces(float deltaTime) {
+	vel.x *= drag;
+	vel.y += (vel.y < 0.0f ? 0.5f : 1.0f) * gravity * deltaTime;
 }
 
-// update variables
-void Entity::updateMovement(float deltaTime) {
-	// move player
-	pos += vel * deltaTime;
-	setPosition({ pos });
-
-	// handle jump physics
+void Entity::resetJumpTimer(float deltaTime) {
 	if (onFloor)
 		jumps = maxJumps;
 	onFloor = false;
@@ -48,50 +27,45 @@ void Entity::updateAnimation(float deltaTime) {
 		animationCooldown -= deltaTime;
 		return;
 	}
-	animationCooldown = animationMaxCooldown;
+	animationCooldown += animationMaxCooldown;
 
-	// moving right
-	if (vel.x > 0.1f) {
-		animation = animation == Animation::right_2 ? Animation::right_1 : Animation::right_2;
-	}
+	// pick next animation
+	if (vel.x > 0.1f) animation = animation == Animation::right_2 ? Animation::right_1 : Animation::right_2;
+	else if (vel.x < -0.1f) animation = animation == Animation::left_2 ? Animation::left_1 : Animation::left_2;
+	else animation = Animation::stationary;
 
-	// moving left
-	else if (vel.x < -0.1f) {
-		animation = animation == Animation::left_2 ? Animation::left_1 : Animation::left_2;
-	}
+	if (animation == lastAnimation) return;
 
-	// not moving
-	else {
-		animation = Animation::stationary;
-	}
-
-	if (animation == lastAnimation) {
-		return;
-	}
-
-	setTexture(textures[(int)log2<int>((int)animation)]);
+	setTexture(*textures[(int)log2<int>((int)animation)]);
 }
 
-// collisions
-void Entity::checkCollision(const float deltaTime, const Platform& target, const bool resolve) {
+void Entity::update(float deltaTime) {
+	move(vel * deltaTime);
+	updateAnimation(deltaTime);
+	applyExternalForces(deltaTime);
+	resetJumpTimer(deltaTime);
+}
+
+// swept AABB collisions
+void Entity::checkCollision(const float deltaTime, const sf::Sprite& target, const bool resolve) {
 
 	// check if entity is moving
-	if (this->vel.x == 0 && this->vel.y == 0) return;
+	if (vel.x == 0 && vel.y == 0) return;
 
 	sf::Vector2f targetPos = target.getPosition();
 	sf::Vector2f targetSize = sf::Vector2f(target.getTexture()->getSize());
 
 	// expand target by player size
-	targetPos -= this->size / 2.0f;
-	targetSize += this->size;
+	targetPos -= size / 2.0f;
+	targetSize += size;
 
 	// allow player to sink in the platform a bit
 	targetPos.y += 5;
 	targetSize.y -= 5;
 
-	// simulate a ray between the current position and last position
-	const sf::Vector2f& ray_origin = this->pos + this->size / 2.0f;
-	const sf::Vector2f& ray_dir = this->vel * deltaTime;
+	// simulate a ray between the current position and next position
+	const sf::Vector2f& ray_origin = getPosition() + (size / 2.0f);
+	const sf::Vector2f& ray_dir = vel * deltaTime;
 
 	// check where in the ray a collision occurred
 	sf::Vector2f t_near = (targetPos - ray_origin) / ray_dir;
@@ -132,26 +106,36 @@ void Entity::checkCollision(const float deltaTime, const Platform& target, const
 
 	// resolve collision
 	if (resolve) {
-		this->vel += contact_normal * sf::Vector2f(std::abs(this->vel.x), std::abs(this->vel.y)) * (1 - contact_time);
-
-		if (contact_normal.y == -1.0f)
-			onFloor = true;
+		vel += contact_normal * sf::Vector2f(std::abs(vel.x), std::abs(vel.y)) * (1.0f - contact_time);
+		if (contact_normal.y == -1.0f) { onFloor = true; }
 	}
-
-	// save collision for later
 	else {
-		collisions.push_back({ &target, contact_time });
+		collisions.emplace_back(&target, contact_time);
 	}
 }
 
 // resolve collisions with platform objects
 void Entity::resolveCollisions(const float deltaTime) {
-	std::sort(collisions.begin(), collisions.end(), [](const std::pair<const Platform*, float>& a, const std::pair<const Platform*, float>& b) { return a.second < b.second; });
+	 std::sort(collisions.begin(), collisions.end(),[](
+		const std::pair<const sf::Sprite*, float>& a,
+		const std::pair<const sf::Sprite*, float>& b
+		) { return a.second < b.second; }
+	);
 	for (unsigned int i = 0; i < collisions.size(); i++)
 		checkCollision(deltaTime, *collisions[i].first, true);
+	collisions.clear();
 }
 
-// move position of object
-void Entity::cameraMoveBy(sf::Vector2f camera) {
-	pos += camera;
+// controls
+void Entity::jump() {
+	if (jumps && !jumpCooldown) {
+		vel.y = jumpVel;
+		jumps -= 1;
+		jumpCooldown = 0.2f;
+	}
 }
+void Entity::moveLeft() { vel.x = -maxVel; }
+void Entity::moveRight() { vel.x = maxVel; }
+void Entity::moveDown() { vel.y = maxVel; }
+
+

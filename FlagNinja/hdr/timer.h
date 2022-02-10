@@ -15,9 +15,8 @@ class Timer {
 	double getTime();
 
 public:
-
 	Timer();
+
 	const float& getDeltaTime();
 	void update();
-
 };

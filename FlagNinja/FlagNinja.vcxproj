@@ -96,7 +96,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x86\include;$(ProjectDir)hdr</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PerformanceProfiler\hdr;$(SolutionDir)sfml\x86\include;$(ProjectDir)hdr</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExceptionHandling>Sync</ExceptionHandling>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
@@ -120,7 +120,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SFML_STATIC;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x86\include;$(ProjectDir)hdr</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PerformanceProfiler\hdr;$(SolutionDir)sfml\x86\include;$(ProjectDir)hdr</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExceptionHandling>Sync</ExceptionHandling>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -129,6 +129,8 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,7 +147,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SFML_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x64\include;$(ProjectDir)hdr</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PerformanceProfiler\hdr;$(SolutionDir)sfml\x64\include;$(ProjectDir)hdr</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExceptionHandling>Sync</ExceptionHandling>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
@@ -169,7 +171,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>SFML_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)sfml\x64\include;$(ProjectDir)hdr</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)PerformanceProfiler\hdr;$(SolutionDir)sfml\x64\include;$(ProjectDir)hdr</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExceptionHandling>Sync</ExceptionHandling>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -178,6 +180,8 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <Optimization>MaxSpeed</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -189,7 +193,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\bullet.cpp" />
+    <ClCompile Include="src\coin.cpp" />
+    <ClCompile Include="src\enemy.cpp" />
     <ClCompile Include="src\entity.cpp" />
+    <ClCompile Include="src\flag.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\gun.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -203,8 +211,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="src\platform.cpp" />
     <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\staticEntity.cpp" />
     <ClCompile Include="src\textures.cpp" />
     <ClCompile Include="src\sfmlExtension.cpp" />
     <ClCompile Include="src\timer.cpp" />
@@ -213,25 +221,45 @@
     <Text Include="assets\maps\0.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\enemy\enemy_1.psd" />
     <None Include="assets\guns\bullet.psd" />
     <None Include="assets\guns\pistol.psd" />
-    <None Include="assets\player\default.psd" />
+    <None Include="assets\player\player_0.psd" />
     <None Include="assets\player\player_1.psd" />
     <None Include="assets\player\player_2.psd" />
+    <None Include="assets\player\player_3.psd" />
+    <None Include="assets\player\player_4.psd" />
+    <None Include="assets\world\coin_0.psd" />
+    <None Include="assets\world\coin_1.psd" />
+    <None Include="assets\world\coin_2.psd" />
     <None Include="assets\world\dirt.psd" />
+    <None Include="assets\world\flag_0.psd" />
+    <None Include="assets\world\flag_1.psd" />
     <None Include="assets\world\floorTile.psd" />
     <None Include="assets\world\grass.psd" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="hdr\bullet.h" />
+    <ClInclude Include="hdr\coin.h" />
+    <ClInclude Include="hdr\enemy.h" />
     <ClInclude Include="hdr\entity.h" />
+    <ClInclude Include="hdr\flag.h" />
     <ClInclude Include="hdr\game.h" />
     <ClInclude Include="hdr\gun.h" />
     <ClInclude Include="hdr\pch.h" />
-    <ClInclude Include="hdr\platform.h" />
     <ClInclude Include="hdr\player.h" />
     <ClInclude Include="hdr\sfmlExtension.h" />
+    <ClInclude Include="hdr\staticEntity.h" />
     <ClInclude Include="hdr\textuers.h" />
     <ClInclude Include="hdr\timer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PerformanceProfiler\PerformanceProfiler.vcxproj">
+      <Project>{fee0c468-6b65-419a-b5b4-16c15f4af2e5}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\fonts\comic.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
