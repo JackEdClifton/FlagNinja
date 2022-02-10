@@ -55,7 +55,7 @@ public:
 	}
 
 	void WriteProfile(const ProfileResult& result) {
-		if (m_ProfileCount > 2) {
+		if (m_ProfileCount > 1) {
 			m_OutputStream << ',';
 		}
 		m_ProfileCount += 1;

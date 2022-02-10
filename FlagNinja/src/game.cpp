@@ -20,6 +20,7 @@ namespace window {
 
 
 Game::Game() {
+	font.loadFromFile("./assets/fonts/comic.ttf");
 	readMap(0);
 	window.setFramerateLimit(window::frameRate);
 	updateGameAttributes();
@@ -110,7 +111,7 @@ void Game::readMap(int num) {
 }
 
 void Game::drawObjects() {
-
+	PROFILE;
 	adjustCamera();
 
 	for (auto& platform : platforms)
@@ -130,8 +131,7 @@ void Game::drawObjects() {
 }
 
 void Game::drawUI() {
-	sf::Font font;
-	font.loadFromFile("./assets/fonts/comic.ttf");
+	PROFILE;
 
 	sf::Text scoreText("Score: " + std::to_string(score), font);
 	scoreText.setFillColor(sf::Color::White);
@@ -142,6 +142,7 @@ void Game::drawUI() {
 }
 
 void Game::updateDisplay() {
+	PROFILE;
 	drawObjects();
 	drawUI();
 
@@ -150,6 +151,7 @@ void Game::updateDisplay() {
 }
 
 void Game::handleCollisions() {
+	PROFILE;
 
 	// players
 	for (auto& player : players) {		
@@ -206,11 +208,13 @@ void Game::handleCollisions() {
 }
 
 void Game::updateGameAttributes() {
+	PROFILE;
 	timer.update();
 	mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 }
 
 void Game::updateEntitys() {
+	PROFILE;
 	for (auto& obj : players) obj.update(deltaTime, mousePosition);
 	for (auto& obj : enemies) obj.update(deltaTime);
 	for (auto& obj : coins) obj.update(deltaTime);
@@ -218,6 +222,7 @@ void Game::updateEntitys() {
 }
 
 void Game::handleInput() {
+	PROFILE;
 
 	// sfml events
 	sf::Event sfEvent;

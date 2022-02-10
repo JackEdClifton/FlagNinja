@@ -21,6 +21,8 @@ class Game {
 
 	int score = 0;
 
+	sf::Font font;
+
 	void readMap(int num);  // read and load map file
 	void adjustCamera();  // move all drawable objects to keep player within window
 	void resetCamera();
