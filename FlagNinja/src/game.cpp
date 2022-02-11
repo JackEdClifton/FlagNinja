@@ -7,9 +7,9 @@ namespace window {
 	const char* title = "FlagNinja";
 	const int frameRate = 120;
 
-#if _DEBUG and 0
-	unsigned int width = sf::VideoMode::getDesktopMode().width / 2;
-	unsigned int height = sf::VideoMode::getDesktopMode().height / 2;
+#if _DEBUG
+	unsigned int width = sf::VideoMode::getDesktopMode().width / 1.5f;
+	unsigned int height = sf::VideoMode::getDesktopMode().height / 1.5f;
 	unsigned int style = sf::Style::Default;
 #else
 	unsigned int width = sf::VideoMode::getDesktopMode().width;
@@ -21,9 +21,7 @@ namespace window {
 
 Game::Game() {
 	font.loadFromFile("./assets/fonts/comic.ttf");
-	readMap(0);
 	window.setFramerateLimit(window::frameRate);
-	updateGameAttributes();
 }
 
 Game::~Game() {
@@ -34,91 +32,121 @@ Game::~Game() {
 
 void Game::mainMenu() {
 
-	float width = 100.0f;
-	float height = 50.0f;
-	float xPos = window::width / 2.0f - width;
-	float yPos = 500.0f;
+	enum class Button : int {
+		Continue, SelectLevel, Settings
+	};
+
+	sf::Texture titleNameTexture;
+	sf::RectangleShape titleName;
+	titleNameTexture.loadFromFile("./assets/mainMenu/titleName.psd");
+	titleName.setTexture(&titleNameTexture);
+	//titleName.setSize((sf::Vector2f)titleName.getTexture()->getSize());
+	titleName.setSize({ window::width / 2.0f, window::height / 2.0f});
+	titleName.setPosition(
+		(window::width - titleName.getSize().x) / 2,
+		50.0f
+	);
+
+	float width = window::width / 5.0f;
+	float height = window::height / 10.0f;
+	float xPos = (window::width - width) / 2.0f;
+	float yPos = window::height / 2.0f;
+
+	const char* optionNames[] = {"Continue", "Select Level", "Settings"};
 
 	while (window.isOpen()) {
+
+		mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+		bool mouseButtonDown = false;
+
+		sf::Event sfEvent;
+		while (window.pollEvent(sfEvent)) {
+
+			// close window button
+			if (sfEvent.type == sf::Event::Closed)
+				window.close();
+
+			// close window for full screens
+			if (sfEvent.type == sf::Event::KeyPressed)
+				if (sfEvent.key.code == sf::Keyboard::Escape)
+					window.close();
+
+			// shooting button
+			if (sfEvent.type == sf::Event::MouseButtonPressed && sfEvent.mouseButton.button == sf::Mouse::Left)
+				mouseButtonDown = true;
+				
+		}
+
+		// draw title name?
+		//std::cout << titleName.getSize().x << ", " << titleName.getSize().y << '\n';
+		window.draw(titleName);
+
 		sf::RectangleShape button({ width, height });
-		button.setPosition(xPos, yPos);
+		sf::Text buttonText;
+		buttonText.setFont(font);
 
-		button.move(0, height + 10.0f);
-		window.draw(button);
+		for (int i = 0; i < 3; i++) {
+			
+			// draw button background
+			button.setPosition(xPos, yPos + (height + 50.0f) * i);
+			
+			if (sf::isPointWithinRect(mousePosition, button.getPosition(), { width, height })) {
+				if (mouseButtonDown) {
+					if (i == 0) {
+						readMap(0);
+						mainloop();
+					}
+					else if (i == 1) {
+						// go to level selection
+					}
+					else if (i == 2) {
+						// go to settings
+					}
+				}
+				
+				button.setFillColor(sf::Color(0xff5555ff));
+			}
+			else
+				button.setFillColor(sf::Color(0xdd2222ff));
+			window.draw(button);
 
-		button.move(0, height + 10.0f);
-		window.draw(button);
 
-		button.move(0, height + 10.0f);
-		window.draw(button);
+			// draw text
+			buttonText.setString(optionNames[i]);
+			buttonText.setPosition(
+				xPos + (width - buttonText.getGlobalBounds().width) / 2.0f,
+				(yPos + (height + 50.0f) * i) + (height / 2.0f - buttonText.getGlobalBounds().height)
+			);
+			window.draw(buttonText);
+
+		}
+		
 
 		window.display();
 		window.clear(sf::Color(30, 50, 240));
 	}
 }
 
-void Game::mainloop() {
-	while (window.isOpen()) {
-		PROFILE;
-		updateGameAttributes();  // update timer and mouse values
-		handleInput();  // handle input from the user
-		handleCollisions();  // handle collisions for all collidable objects
-		updateEntitys();
-		updateDisplay();  // draw objects and UI to window
-	}
-}
-
-void Game::adjustCamera() {
-
-	// get positions and sizes
-	sf::Vector2f player = players[0].getPosition();
-	sf::Vector2f display = sf::Vector2f(window.getSize());
-	sf::Vector2f safezone = display / 1.2f;
-
-	player -= safezone / 2.0f;
-	display -= safezone;
-
-	sf::Vector2f camera = { 0.0f, 0.0f };
-
-	if (player.x > display.x)
-		camera.x = display.x - player.x;
-	else if (player.x < 0.0f)
-		camera.x = -player.x;
-
-	if (player.y > display.y)
-		camera.y = display.y - player.y;
-	else if (player.y < 0.0f)
-		camera.y = -player.y;
-
-	moveObjects(camera);
-}
-
-void Game::resetCamera() {
-	moveObjects(-overallCameraDisplacement);
-}
-
-void Game::moveObjects(const sf::Vector2f& displacement) {
-	for (auto& obj : players) obj.move(displacement);
-	for (auto& obj : enemies) obj->move(displacement);
-	for (auto& obj : bullets) obj->move(displacement);
-	for (auto& obj : platforms) obj.move(displacement);
-	for (auto& obj : coins) obj.move(displacement);
-	flag.move(displacement);
-	overallCameraDisplacement += displacement;
-}
-
 void Game::readMap(int num) {
 
+	// clear objects
+	players.clear();
+	enemies.clear();
+	bullets.clear();
+	platforms.clear();
+	coins.clear();
+
+	// read file
 	std::string line;
 	std::string filename = std::to_string(num) + ".txt";
 	std::ifstream file("./assets/maps/" + filename);
 
 	bool containsPlayer = false;
-
 	float x = 0.0f;
 	float y = 0.0f;
 	const float step = 64.0f;
 
+	// iterate though file
 	while (std::getline(file, line)) {
 		x = -step;
 
@@ -141,10 +169,78 @@ void Game::readMap(int num) {
 	}
 	file.close();
 
+	// make sure a player has been spawned
 	if (!containsPlayer) {
 		std::cerr << "WARNING! - No player detected when reading file (" << filename << ")\n";  // this wont work in release mode -> no console
 		players.emplace_back(0.0f, 0.0f);
 	}
+
+	// ensure nothing will move at start of game
+	updateGameAttributes();
+	updateGameAttributes();
+}
+
+void Game::updateGameAttributes() {
+	PROFILE;
+	timer.update();
+	mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+}
+
+void Game::mainloop() {
+	gameEnded = false;
+	while (window.isOpen() && !gameEnded) {
+		PROFILE;
+		updateGameAttributes();  // update timer and mouse values
+		handleInput();  // handle input from the user
+		handleCollisions();  // handle collisions for all collidable objects
+		updateEntitys();
+		updateDisplay();  // draw objects and UI to window
+	}
+}
+
+void Game::resetCamera() {
+	moveObjects(-overallCameraDisplacement);
+}
+
+void Game::destroyBullet(int index) {
+#if _DEBUG
+	if (index >= bullets.size()) {
+		std::cerr << "WARNING! - Bullet index out of range!\n";
+		return;
+	}
+#endif
+	bullets[index] = bullets[bullets.size() - 1];
+	bullets.pop_back();
+}
+
+void Game::destroyEnemy(int index) {
+#if _DEBUG
+	if (index >= enemies.size()) {
+		std::cerr << "WARNING! - Enemy index out of range!\n";
+		return;
+	}
+#endif
+	enemies[index] = enemies[enemies.size() - 1];
+	enemies.pop_back();
+}
+
+void Game::moveObjects(const sf::Vector2f& displacement) {
+	for (auto& obj : players) obj.move(displacement);
+	for (auto& obj : enemies) obj->move(displacement);
+	for (auto& obj : bullets) obj->move(displacement);
+	for (auto& obj : platforms) obj.move(displacement);
+	for (auto& obj : coins) obj.move(displacement);
+	flag.move(displacement);
+	overallCameraDisplacement += displacement;
+}
+
+void Game::updateDisplay() {
+	PROFILE;
+	drawObjects();
+	drawUI();
+
+	window.display();
+	window.clear(sf::Color(30, 50, 240));
 }
 
 void Game::drawObjects() {
@@ -177,6 +273,31 @@ void Game::drawObjects() {
 	window.draw(flag);
 }
 
+void Game::adjustCamera() {
+
+	// get positions and sizes
+	sf::Vector2f player = players[0].getPosition();
+	sf::Vector2f display = sf::Vector2f(window.getSize());
+	sf::Vector2f safezone = display / 1.2f;
+
+	player -= safezone / 2.0f;
+	display -= safezone;
+
+	sf::Vector2f camera = { 0.0f, 0.0f };
+
+	if (player.x > display.x)
+		camera.x = display.x - player.x;
+	else if (player.x < 0.0f)
+		camera.x = -player.x;
+
+	if (player.y > display.y)
+		camera.y = display.y - player.y;
+	else if (player.y < 0.0f)
+		camera.y = -player.y;
+
+	moveObjects(camera);
+}
+
 void Game::drawUI() {
 	PROFILE;
 
@@ -185,37 +306,6 @@ void Game::drawUI() {
 	scoreText.setStyle(sf::Text::Bold);
 	scoreText.setPosition((float)(window::width - 200), 20.0f);
 	window.draw(scoreText);
-}
-
-void Game::destroyBullet(int index) {
-#if _DEBUG
-	if (index >= bullets.size()) {
-		std::cerr << "WARNING! - Bullet index out of range!\n";
-		return;
-	}
-#endif
-	bullets[index] = bullets[bullets.size() - 1];
-	bullets.pop_back();
-}
-
-void Game::destroyEnemy(int index) {
-#if _DEBUG
-	if (index >= enemies.size()) {
-		std::cerr << "WARNING! - Enemy index out of range!\n";
-		return;
-	}
-#endif
-	enemies[index] = enemies[enemies.size() - 1];
-	enemies.pop_back();
-}
-
-void Game::updateDisplay() {
-	PROFILE;
-	drawObjects();
-	drawUI();
-
-	window.display();
-	window.clear(sf::Color(30, 50, 240));
 }
 
 void Game::handleCollisions() {
@@ -257,7 +347,7 @@ void Game::handleCollisions() {
 		for (auto& player : players) {
 			if (isColliding(*bullets[i], player)) {
 				if (player.hit(2.0f)) {
-					window.close();
+					gameEnded = true;
 				}
 				destroyBullet(i);
 				goto exitBulletLoop;
@@ -293,15 +383,9 @@ exitBulletLoop:
 	for (auto& player : players) {
 		if (isColliding(flag, player)) {
 			score += 200;
-			window.close();
+			gameEnded = true;
 		}
 	}
-}
-
-void Game::updateGameAttributes() {
-	PROFILE;
-	timer.update();
-	mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 }
 
 void Game::updateEntitys() {
@@ -326,7 +410,7 @@ void Game::handleInput() {
 		// close game -> pause menu
 		if (sfEvent.type == sf::Event::KeyPressed)
 			if (sfEvent.key.code == sf::Keyboard::Escape)
-				window.close();
+				gameEnded = true;
 
 		// shooting button
 		if (sfEvent.type == sf::Event::MouseButtonPressed && sfEvent.mouseButton.button == sf::Mouse::Left)

@@ -37,6 +37,11 @@ namespace sf {
 	}
 
 
+	bool isPointWithinRect(sf::Vector2f aPos, sf::Vector2f bPos, sf::Vector2f bSize) {
+		return (aPos.x > bPos.x) && (aPos.x < bPos.x + bSize.x)
+			&& (aPos.y > bPos.y) && (aPos.y < bPos.y + bSize.y);
+	}
+	
 	bool isSpriteInWindow(const sf::Sprite& sprite, const sf::RenderWindow& window) {
 		sf::Vector2f spriteSize = (sf::Vector2f)sprite.getTexture()->getSize();
 		sf::Vector2f spritePos = sprite.getPosition() + spriteSize;
@@ -47,19 +52,13 @@ namespace sf {
 	}
 
 	bool isColliding(const sf::Sprite& a, const sf::Sprite& b) {
-		sf::Vector2f thisPos = a.getPosition();
-		sf::Vector2f thisSize = (
-			sf::Vector2f
-			)(
-				a.getTexture()
-				->getSize()
-				);
+		sf::Vector2f aSize = (sf::Vector2f)(a.getTexture()->getSize());
 
-		sf::Vector2f targetPos = b.getPosition() - thisSize;
-		sf::Vector2f targetSize = (sf::Vector2f)(b.getTexture()->getSize()) + thisSize;
-
-		return (thisPos.x > targetPos.x) && (thisPos.x < targetPos.x + targetSize.x)
-			&& (thisPos.y > targetPos.y) && (thisPos.y < targetPos.y + targetSize.y);
+		return isPointWithinRect(
+			a.getPosition(),
+			b.getPosition() - aSize,
+			(sf::Vector2f)(b.getTexture()->getSize()) + aSize
+		);
 	}
 
 	bool isViewObstructed(const sf::Sprite& a, const sf::Sprite& b, const std::vector<StaticEntity>& platforms) {

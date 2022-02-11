@@ -20,6 +20,7 @@ class Game {
 	sf::Vector2f mousePosition;
 
 	int score = 0;
+	bool gameEnded = true;
 
 	sf::Font font;
 

@@ -12,6 +12,7 @@ namespace sf {
 	extern Vector2f operator*(sf::Vector2f, sf::Vector2f);
 	extern Vector2f operator*=(sf::Vector2f, sf::Vector2f);
 
+	bool isPointWithinRect(sf::Vector2f aPos, sf::Vector2f bPos, sf::Vector2f bSize);
 	bool isSpriteInWindow(const sf::Sprite& sprite, const sf::RenderWindow& window);
 	bool isColliding(const sf::Sprite& a, const sf::Sprite& b);
 
