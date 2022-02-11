@@ -22,7 +22,5 @@ void Player::initTextures() {
 
 void Player::update(float deltaTime, const sf::Vector2f& mousePosition) {
 	Entity::update(deltaTime);
-
-	gun.setPosition(getPosition() + size / sf::Vector2f(2.0f, 5.0f));
 	gun.aimTowards(mousePosition);
 }

@@ -2,15 +2,22 @@
 #include "pch.h"
 #include "entity.h"
 
+// construct entity object
 Entity::Entity(float xPos, float yPos) {
 	setPosition(xPos, yPos);
 }
 
+// getter for velocity
+const sf::Vector2f& Entity::getVel() const { return vel; }
+const sf::Vector2f& Entity::getSize() const { return size; }
+
+// apply drag and gravity effects
 void Entity::applyExternalForces(float deltaTime) {
 	vel.x *= drag;
 	vel.y += (vel.y < 0.0f ? 0.5f : 1.0f) * gravity * deltaTime;
 }
 
+// if the player is on the floor they should be able to jump again
 void Entity::resetJumpTimer(float deltaTime) {
 	if (onFloor)
 		jumps = maxJumps;
@@ -18,6 +25,7 @@ void Entity::resetJumpTimer(float deltaTime) {
 	jumpCooldown = std::max(0.0f, jumpCooldown - deltaTime);
 }
 
+// set the texture so the entity looks like its walking
 void Entity::updateAnimation(float deltaTime) {
 
 	Animation lastAnimation = animation;
@@ -39,9 +47,18 @@ void Entity::updateAnimation(float deltaTime) {
 	setTexture(*textures[(int)log2<int>((int)animation)]);
 }
 
+void Entity::updateGun(float deltaTime) {
+	gun.setPosition(getPosition() + size / sf::Vector2f(2.0f, 5.0f));
+	shootDelay -= deltaTime;
+	if (shootDelay < 0.0f)
+		shootDelay = 0.0f;
+}
+
+// wrapper for other update functions
 void Entity::update(float deltaTime) {
 	move(vel * deltaTime);
 	updateAnimation(deltaTime);
+	updateGun(deltaTime);
 	applyExternalForces(deltaTime);
 	resetJumpTimer(deltaTime);
 }
@@ -116,7 +133,7 @@ void Entity::checkCollision(const float deltaTime, const sf::Sprite& target, con
 
 // resolve collisions with platform objects
 void Entity::resolveCollisions(const float deltaTime) {
-	 std::sort(collisions.begin(), collisions.end(),[](
+	std::sort(collisions.begin(), collisions.end(), [](
 		const std::pair<const sf::Sprite*, float>& a,
 		const std::pair<const sf::Sprite*, float>& b
 		) { return a.second < b.second; }
@@ -126,7 +143,32 @@ void Entity::resolveCollisions(const float deltaTime) {
 	collisions.clear();
 }
 
-// controls
+// draw health bar
+void Entity::drawHealthBar(sf::RenderWindow* window) {
+	sf::RectangleShape healthBar({ 50.0f, 5.0f });
+	healthBar.setPosition(getPosition() + sf::Vector2f(0.0f, -10.0f));
+	healthBar.setFillColor(sf::Color::Red);
+	window->draw(healthBar);
+	healthBar.setSize(sf::Vector2f((health / 2.0f), 5.0f));
+	healthBar.setFillColor(sf::Color::Green);
+	window->draw(healthBar);
+}
+
+
+// spawn a bullet obj
+void Entity::shoot(std::vector<Bullet*>& bullets) {
+	if (shootDelay == 0.0f) {
+		bullets.push_back(new Bullet(gun.getPosition(), gun.getUnitVector()));
+		shootDelay = maxShootDelay;
+	}
+}
+
+bool Entity::hit(float damage) {
+	health -= damage;
+	return health <= 0.0f;
+}
+
+// control the entitys movement
 void Entity::jump() {
 	if (jumps && !jumpCooldown) {
 		vel.y = jumpVel;
@@ -134,8 +176,11 @@ void Entity::jump() {
 		jumpCooldown = 0.2f;
 	}
 }
+void Entity::moveDown() {
+	vel.y = maxVel;
+	jumps = 0;
+}
 void Entity::moveLeft() { vel.x = -maxVel; }
 void Entity::moveRight() { vel.x = maxVel; }
-void Entity::moveDown() { vel.y = maxVel; }
 
 

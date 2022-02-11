@@ -29,11 +29,16 @@ class Game {
 	void moveObjects(const sf::Vector2f& displacement);
 	void drawObjects();  // draw objects
 	void drawUI();  // draw user interface
+	void destroyBullet(int index);
+	void destroyEnemy(int index);
 
 public:
 
 	Game();
 	~Game();
+
+	void mainMenu();
+	void mainloop();
 
 	sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(window::width, window::height), window::title, window::style);
 	Timer timer;
@@ -41,7 +46,7 @@ public:
 
 	// drawable objects
 	std::vector<Player> players;
-	std::vector<Enemy> enemies;
+	std::vector<Enemy*> enemies;
 	std::vector<Bullet*> bullets;
 	std::vector<StaticEntity> platforms;
 	std::vector<Coin> coins;

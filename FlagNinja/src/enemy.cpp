@@ -4,6 +4,11 @@
 
 Enemy::Enemy(float xPos, float yPos) : Entity(xPos, yPos) {
 	initTextures();
+
+	gun.scale(0.7f, 0.7f);
+	maxVel = 100.0f;
+	maxJumps = 1;
+	jumpVel = -100.0f;
 }
 
 void Enemy::initTextures() {
@@ -19,3 +24,34 @@ void Enemy::initTextures() {
 	scale(scaleFactor);
 	size = sf::Vector2f(getTexture()->getSize()) * scaleFactor;
 }
+
+
+void Enemy::update(float deltaTime, const std::vector<Player>& players, const std::vector<StaticEntity>& platforms, std::vector<Bullet*>& bullets) {
+	Entity::update(deltaTime);
+
+	float x = (getVel().x < 0.0f) ? -1.0f : 1.0f;
+	bool shootGun = false;
+	sf::Vector2f target = getPosition() + sf::Vector2f(500.0f * x, 0.0f);
+	float closestPlayer = 400.0f;
+
+	for (auto& player : players) {
+		if (!sf::isViewObstructed(*this, player, platforms)) {
+
+			const sf::Vector2f& distanceVector = player.getPosition() - getPosition();
+			float distance = sqrt(distanceVector.x * distanceVector.x + distanceVector.y * distanceVector.y);
+
+			if (distance < closestPlayer) {
+				closestPlayer = distance;
+				target = player.getPosition();
+				shootGun = true;
+			}
+
+		}
+	}
+
+	gun.aimTowards(target);
+	if (shootGun && closestPlayer < 200.0f)
+		shoot(bullets);
+}
+
+

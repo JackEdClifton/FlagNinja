@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gun.h"
+#include "bullet.h"
 
 class Entity : public sf::Sprite {
 
@@ -22,14 +23,17 @@ protected:
 	// physics
 	const float gravity = 640.0f;
 	const float drag = 1.0f - 0.2f;
-	const float maxVel = 400.0f;
-	const float jumpVel = -220.0f;
+	float maxVel = 400.0f;
+	float jumpVel = -220.0f;
 
 	// controls
+	float health = 100.0f;
 	bool onFloor = false;
-	short maxJumps = 2;
-	short jumps = 0;
+	int maxJumps = 2;
+	int jumps = 0;
 	float jumpCooldown = 0.0f;
+	float shootDelay = 0.0f;
+	float maxShootDelay = 0.1f;
 
 	// animation
 	Animation animation = Animation::stationary;
@@ -40,19 +44,24 @@ protected:
 	void applyExternalForces(float deltaTime);
 	void resetJumpTimer(float deltaTime);
 	void updateAnimation(float deltaTime);
+	void updateGun(float deltaTime);
 
 public:
 
-	// constructor
 	Entity(float xPos, float yPos);
+
 	Gun gun = Gun("./assets/guns/pistol.psd");
 
-	// movement
+	const sf::Vector2f& getVel() const;
+	const sf::Vector2f& getSize() const;
+
 	void update(float deltaTime);
 	void checkCollision(const float deltaTime, const sf::Sprite& target, const bool resolve = false);
 	void resolveCollisions(const float deltaTime);
+	void drawHealthBar(sf::RenderWindow* window);
+	void shoot(std::vector<Bullet*>& bullets);
+	bool hit(float damage);
 
-	// move position of object
 	void jump();
 	void moveLeft();
 	void moveRight();

@@ -7,8 +7,8 @@ class Gun : public sf::Sprite {
 	bool isFlipped = false;
 
 public:
-	const sf::Vector2f& getUnitVector() const;
 	Gun(const char* texturePath);
+	const sf::Vector2f& getUnitVector() const;
 	void aimTowards(const sf::Vector2f& target);
 };
 
