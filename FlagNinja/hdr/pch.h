@@ -9,6 +9,7 @@
 #include <fstream>
 #include <thread>
 #include <future>
+#include <filesystem>
 
 #include <Windows.h>
 

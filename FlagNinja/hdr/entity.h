@@ -22,9 +22,8 @@ protected:
 
 	// physics
 	const float gravity = 640.0f;
-	const float drag = 1.0f - 0.2f;
 	float maxVel = 400.0f;
-	float jumpVel = -220.0f;
+	float jumpVel = -300.0f;
 
 	// controls
 	float health = 100.0f;
@@ -41,7 +40,6 @@ protected:
 	float animationMaxCooldown = 0.15f;
 
 	virtual void initTextures() = 0;
-	void applyExternalForces(float deltaTime);
 	void resetJumpTimer(float deltaTime);
 	void updateAnimation(float deltaTime);
 	void updateGun(float deltaTime);

@@ -24,14 +24,14 @@ class Game {
 
 	sf::Font font;
 
-	void readMap(int num);  // read and load map file
+	void readMap(const std::string& filename);  // read and load map file
 	void adjustCamera();  // move all drawable objects to keep player within window
 	void resetCamera();
 	void moveObjects(const sf::Vector2f& displacement);
 	void drawObjects();  // draw objects
 	void drawUI();  // draw user interface
-	void destroyBullet(int index);
-	void destroyEnemy(int index);
+	void destroyBullet(unsigned int index);
+	void destroyEnemy(unsigned int index);
 
 public:
 
@@ -39,7 +39,8 @@ public:
 	~Game();
 
 	void mainMenu();
-	void mainloop();
+	void playMap(const std::string& map);
+	void levelSelection();
 
 	sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(window::width, window::height), window::title, window::style);
 	Timer timer;

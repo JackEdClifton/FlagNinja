@@ -11,12 +11,6 @@ Entity::Entity(float xPos, float yPos) {
 const sf::Vector2f& Entity::getVel() const { return vel; }
 const sf::Vector2f& Entity::getSize() const { return size; }
 
-// apply drag and gravity effects
-void Entity::applyExternalForces(float deltaTime) {
-	vel.x *= drag;
-	vel.y += (vel.y < 0.0f ? 0.5f : 1.0f) * gravity * deltaTime;
-}
-
 // if the player is on the floor they should be able to jump again
 void Entity::resetJumpTimer(float deltaTime) {
 	if (onFloor)
@@ -59,7 +53,8 @@ void Entity::update(float deltaTime) {
 	move(vel * deltaTime);
 	updateAnimation(deltaTime);
 	updateGun(deltaTime);
-	applyExternalForces(deltaTime);
+	vel.x = 0.0f;
+	vel.y += (vel.y < 0.0f ? 1.0f : 2.5f) * gravity * deltaTime;
 	resetJumpTimer(deltaTime);
 }
 
@@ -154,7 +149,6 @@ void Entity::drawHealthBar(sf::RenderWindow* window) {
 	window->draw(healthBar);
 }
 
-
 // spawn a bullet obj
 void Entity::shoot(std::vector<Bullet*>& bullets) {
 	if (shootDelay == 0.0f) {
@@ -177,7 +171,8 @@ void Entity::jump() {
 	}
 }
 void Entity::moveDown() {
-	vel.y = maxVel;
+	if (vel.y < maxVel)
+		vel.y = maxVel;
 	jumps = 0;
 }
 void Entity::moveLeft() { vel.x = -maxVel; }

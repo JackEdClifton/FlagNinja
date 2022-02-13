@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\maps\0.txt" />
+    <Text Include="assets\maps\1.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\player\player_0.psd" />

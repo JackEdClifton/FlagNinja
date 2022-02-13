@@ -29,11 +29,14 @@ void Enemy::initTextures() {
 void Enemy::update(float deltaTime, const std::vector<Player>& players, const std::vector<StaticEntity>& platforms, std::vector<Bullet*>& bullets) {
 	Entity::update(deltaTime);
 
+	// point gun in direction of movement
 	float x = (getVel().x < 0.0f) ? -1.0f : 1.0f;
-	bool shootGun = false;
 	sf::Vector2f target = getPosition() + sf::Vector2f(500.0f * x, 0.0f);
+	
+	bool shootGun = false;
 	float closestPlayer = 400.0f;
 
+	// find closest player
 	for (auto& player : players) {
 		if (!sf::isViewObstructed(*this, player, platforms)) {
 
@@ -48,10 +51,13 @@ void Enemy::update(float deltaTime, const std::vector<Player>& players, const st
 
 		}
 	}
-
+	// aim gun and shoot player
 	gun.aimTowards(target);
 	if (shootGun && closestPlayer < 200.0f)
 		shoot(bullets);
+
+	//moveRight();
+	jump();
 }
 
 

@@ -9,10 +9,10 @@ int main() {
 	Textures::init();
 	Game game;
 	game.mainMenu();
-	game.mainloop();
-
 
 
 	END_PROFILE;
+	std::cout << "\n[Program Finished]";
+	std::cin.get();
 }
 

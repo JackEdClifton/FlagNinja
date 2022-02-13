@@ -1,18 +1,18 @@
 
 gg                   c       gg                                    c                  gg
-dd          c        g              gg  g  g                       g                  dd
+dd          c        g              gg  g  g          c            g                  dd
 dd         gg        d         ggg gd       g                       g     c           dd
-dd   p1    c     c           ggdc1                                  dg    g           dd
+dd   p   1 c     c           ggdc1                                  dg    g           dd
 dd  gggggggggggggggggggggggggdddgggggggggggggggggggg           1  g d                 dd
-dd1    c  d       d         c                          g       ggg           g        dd
-ddggggggggd  g              g                         g                              gdd
-ddc1      dg d         gg             g      g    g   d                     g     gggddd
-ddgggggg     d g  g            g              gg       d                 g    1  gdddddd
-ddc  d dgggggd                                                          gdggggggggggggdd
+dd1    c          d         c                          g       ggg           g        dd
+ddggggggggd  g              g         c                                              gdd
+ddc1      dg d         gg             g      g    g g                       g     gggddd
+ddgggggg     d                 g              gg      g          g       g    1  gdddddd
+ddc  d dgggggd    g                      1                              gdggggggggggggdd
 dd   d                     g      gggg   gggg   gggg   ggggg   g        dddddddddddddddd
-dd         g 1      gggggggd                   gddddgggddddd   d        d             dd
-ddg        dggggggggdddddddd              gggggddddddddddddd   dggggg ggd   1      f  dd
-ddd 1  g1  dddddddddddddddddg1 c     gggggdddddddddddddddddd     1          ggggggggggdd
+dd         g 1      gggggggd                   gddddgggddddd   d 1    1 d             dd
+ddg        dggggggggdddddddd              gggggddddddddddddd   dgggg  ggd   1      f  dd
+ddd 1  g1  dddddddddddddddddg1 c     gggggdddddddddddddddddd     1    c 1   ggggggggggdd
 dddgggggggggdddddddddddddddddggggggggdddddddddddddddddddddddggggggggggggggggdddddddddddd
 dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
 dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
