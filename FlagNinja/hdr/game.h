@@ -41,6 +41,7 @@ public:
 	void mainMenu();
 	void playMap(const std::string& map);
 	void levelSelection();
+	void settings();
 
 	sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(window::width, window::height), window::title, window::style);
 	Timer timer;

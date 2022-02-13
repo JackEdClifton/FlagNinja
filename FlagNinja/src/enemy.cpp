@@ -2,6 +2,8 @@
 #include "pch.h"
 #include "enemy.h"
 
+#include "settings.h"
+
 Enemy::Enemy(float xPos, float yPos) : Entity(xPos, yPos) {
 	initTextures();
 
@@ -25,7 +27,6 @@ void Enemy::initTextures() {
 	size = sf::Vector2f(getTexture()->getSize()) * scaleFactor;
 }
 
-
 void Enemy::update(float deltaTime, const std::vector<Player>& players, const std::vector<StaticEntity>& platforms, std::vector<Bullet*>& bullets) {
 	Entity::update(deltaTime);
 
@@ -34,7 +35,12 @@ void Enemy::update(float deltaTime, const std::vector<Player>& players, const st
 	sf::Vector2f target = getPosition() + sf::Vector2f(500.0f * x, 0.0f);
 	
 	bool shootGun = false;
-	float closestPlayer = 400.0f;
+	float aimDistance = 120.0f;
+	float minShootDistance = 400.0f;
+	if (settings::hardMode)
+		minShootDistance = 600.0f;
+
+	float closestPlayer = minShootDistance;
 
 	// find closest player
 	for (auto& player : players) {
@@ -53,7 +59,7 @@ void Enemy::update(float deltaTime, const std::vector<Player>& players, const st
 	}
 	// aim gun and shoot player
 	gun.aimTowards(target);
-	if (shootGun && closestPlayer < 200.0f)
+	if (shootGun && closestPlayer < minShootDistance - aimDistance)
 		shoot(bullets);
 
 	//moveRight();

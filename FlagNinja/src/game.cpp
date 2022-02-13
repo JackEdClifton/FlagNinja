@@ -18,9 +18,17 @@ namespace window {
 #endif
 }
 
+namespace settings {
+	bool isVsyncEnabled = true;
+	bool hardMode = false;
+
+
+	bool* options[] = { &isVsyncEnabled, &hardMode };
+}
 
 Game::Game() {
 	font.loadFromFile("./assets/fonts/comic.ttf");
+	window.setVerticalSyncEnabled(settings::isVsyncEnabled);
 }
 
 Game::~Game() {
@@ -31,15 +39,22 @@ Game::~Game() {
 
 void Game::mainMenu() {
 
-	sf::Texture titleNameTexture;
-	sf::RectangleShape titleName;
-	titleNameTexture.loadFromFile("./assets/mainMenu/titleName.psd");
-	titleName.setTexture(&titleNameTexture);
-	titleName.setSize({ window::width / 2.0f, window::height / 2.0f });
-	titleName.setPosition(
-		(window::width - titleName.getSize().x) / 2,
+	// logo objects
+	sf::Texture logoTexture;
+	sf::RectangleShape logo;
+	logoTexture.loadFromFile("./assets/mainMenu/logo.psd");
+	logo.setTexture(&logoTexture);
+	logo.setSize({ window::width / 2.0f, window::height / 2.0f });
+	logo.setPosition(
+		(window::width - logo.getSize().x) / 2,
 		20.0f
 	);
+
+	// button objects
+	sf::RectangleShape button;
+	sf::Text buttonText;
+	buttonText.setFont(font);
+	buttonText.setFillColor(sf::Color::Black);
 
 	float width = window::width / 5.0f;
 	float height = window::height / 10.0f;
@@ -71,13 +86,6 @@ void Game::mainMenu() {
 
 		}
 
-		// draw title name
-		window.draw(titleName);
-
-		sf::RectangleShape button;
-		sf::Text buttonText;
-		buttonText.setFont(font);
-		buttonText.setFillColor(sf::Color::Black);
 
 		for (int i = 0; i < 3; i++) {
 
@@ -94,7 +102,7 @@ void Game::mainMenu() {
 						levelSelection();
 					}
 					else if (i == 2) {
-						// go to settings
+						settings();
 					}
 				}
 
@@ -117,7 +125,10 @@ void Game::mainMenu() {
 
 		}
 
+		// draw logo
+		window.draw(logo);
 
+		// update display
 		window.display();
 		window.clear(sf::Color(30, 50, 240));
 	}
@@ -143,12 +154,12 @@ void Game::playMap(const std::string& map) {
 
 void Game::levelSelection() {
 
-	sf::Texture titleNameTexture;
-	sf::RectangleShape titleName;
-	titleNameTexture.loadFromFile("./assets/mainMenu/titleName.psd");
-	titleName.setTexture(&titleNameTexture);
-	titleName.setSize({ window::width / 4.0f, window::height / 4.0f });
-	titleName.setPosition(50.0f, 50.0f);
+	sf::Texture logoTexture;
+	sf::RectangleShape logo;
+	logoTexture.loadFromFile("./assets/mainMenu/logo.psd");
+	logo.setTexture(&logoTexture);
+	logo.setSize({ window::width / 4.0f, window::height / 4.0f });
+	logo.setPosition(50.0f, 50.0f);
 
 	// not needed yet but we dont need this inside the game loop
 	// sizes and positons for level buttons
@@ -193,7 +204,7 @@ void Game::levelSelection() {
 		}
 
 		// draw title name
-		window.draw(titleName);
+		window.draw(logo);
 
 
 		// button to draw options
@@ -205,7 +216,8 @@ void Game::levelSelection() {
 		int row = 0;
 		int column = 1;
 
-		for (auto& filename : std::filesystem::directory_iterator("./assets/maps")) {
+		for (auto& file : std::filesystem::directory_iterator("./assets/maps")) {
+			std::string filename = file.path().filename().string();
 
 			// draw background
 			button.setPosition(xPos + (width + 20.0f) * column, yPos + (height + 20.0f) * row - scroll);
@@ -214,7 +226,7 @@ void Game::levelSelection() {
 				button.setFillColor(sf::Color(0xff2222ff));
 
 				if (mouseButtonDown) {
-					playMap(filename.path().filename().string());
+					playMap(filename);
 					return;
 				}
 			}
@@ -225,9 +237,9 @@ void Game::levelSelection() {
 
 
 			// draw text
-			buttonText.setString(filename.path().filename().string());
+			buttonText.setString(filename.substr(0, filename.size() - 4));
 			const sf::Vector2f textSize = { buttonText.getGlobalBounds().width , buttonText.getGlobalBounds().height };
-			buttonText.setPosition(button.getPosition() + (button.getSize()- textSize) / 2.0f);
+			buttonText.setPosition(button.getPosition() + (button.getSize() - textSize) / 2.0f);
 
 			window.draw(buttonText);
 
@@ -240,6 +252,108 @@ void Game::levelSelection() {
 				column = 1;
 			}
 		}
+		window.display();
+		window.clear(sf::Color(30, 50, 240));
+	}
+}
+
+void Game::settings() {
+	sf::Texture logoTexture;
+	sf::RectangleShape logo;
+	logoTexture.loadFromFile("./assets/mainMenu/logo.psd");
+	logo.setTexture(&logoTexture);
+	logo.setSize({ window::width / 4.0f, window::height / 4.0f });
+	logo.setPosition(50.0f, 50.0f);
+
+	sf::RectangleShape button;
+	sf::Text buttonText;
+	buttonText.setFont(font);
+	buttonText.setFillColor(sf::Color::Black);
+
+	const char* optionNames[] = { "V Sync", "Hard Mode" };
+
+	float scroll = 0.0f;
+
+	// mainloop for level selection
+	while (window.isOpen()) {
+
+		mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+		bool mouseButtonDown = false;
+
+		sf::Event sfEvent;
+		while (window.pollEvent(sfEvent)) {
+
+			// close window button
+			if (sfEvent.type == sf::Event::Closed)
+				window.close();
+
+			// close window for full screens
+			if (sfEvent.type == sf::Event::KeyPressed)
+				if (sfEvent.key.code == sf::Keyboard::Escape)
+					return;
+
+			// scroll through levels
+			if (sfEvent.type == sf::Event::MouseWheelMoved) {
+				scroll -= sfEvent.mouseWheel.delta * 10.0f;
+
+				const float maxScroll = 0.0f;
+
+				if (scroll < 0.0f) scroll = 0.0f;
+				if (scroll > maxScroll) scroll = maxScroll;
+			}
+
+			// shooting button
+			if (sfEvent.type == sf::Event::MouseButtonPressed && sfEvent.mouseButton.button == sf::Mouse::Left)
+				mouseButtonDown = true;
+
+		}
+
+		float width = window::width / 5.0f;
+		float height = window::height / 10.0f;
+		float xPos = (window::width - width) / 2.0f;
+		float yPos = window::height / 2.0f;
+
+		// draw options
+		for (int i = 0; i < 2; i++) {
+
+			// draw button background
+			if (*settings::options[i])
+				button.setFillColor(sf::Color(0x22ff22ff));
+			else
+				button.setFillColor(sf::Color(0xdd2222ff));
+
+
+			button.setPosition(xPos - 10.0f, yPos - 10.0f + (height + 50.0f) * i);
+			button.setSize({ width + 20.0f, height + 20.0f });
+			if (sf::isPointWithinRect(mousePosition, button.getPosition(), { width, height })) {
+				if (mouseButtonDown) {
+					*settings::options[i] = !*settings::options[i];
+					if (i == 0) {
+						window.setVerticalSyncEnabled(settings::isVsyncEnabled);
+					}
+				}
+
+			}
+			else {
+				button.setPosition(xPos, yPos + (height + 50.0f) * i);
+				button.setSize({ width, height });
+			}
+			window.draw(button);
+
+
+			// draw text
+			buttonText.setString(optionNames[i]);
+			buttonText.setPosition(
+				xPos + (width - buttonText.getGlobalBounds().width) / 2.0f,
+				(yPos + (height + 50.0f) * i) + (buttonText.getGlobalBounds().height) / 4.0f
+			);
+			window.draw(buttonText);
+
+		}
+
+
+		window.draw(logo);
+
 		window.display();
 		window.clear(sf::Color(30, 50, 240));
 	}
@@ -411,8 +525,6 @@ void Game::drawObjects() {
 }
 
 void Game::drawUI() {
-	PROFILE;
-
 	sf::Text scoreText("Score: " + std::to_string(score), font);
 	scoreText.setFillColor(sf::Color::White);
 	scoreText.setStyle(sf::Text::Bold);
@@ -421,7 +533,6 @@ void Game::drawUI() {
 }
 
 void Game::handleCollisions() {
-	PROFILE;
 
 	// players
 	for (auto& player : players) {
@@ -458,7 +569,7 @@ void Game::handleCollisions() {
 		// player
 		for (auto& player : players) {
 			if (isColliding(*bullets[i], player)) {
-				if (player.hit(0.2f)) {
+				if (player.hit(0.2f + 1.0f * settings::hardMode)) {
 					gameEnded = true;
 				}
 				destroyBullet(i);

@@ -220,11 +220,13 @@
   <ItemGroup>
     <Text Include="assets\maps\0.txt" />
     <Text Include="assets\maps\1.txt" />
+    <Text Include="assets\maps\Impossible.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\enemy\enemy_1.psd" />
     <None Include="assets\guns\bullet.psd" />
     <None Include="assets\guns\pistol.psd" />
+    <None Include="assets\mainMenu\logo.psd" />
     <None Include="assets\player\player_0.psd" />
     <None Include="assets\player\player_1.psd" />
     <None Include="assets\player\player_2.psd" />
@@ -249,6 +251,7 @@
     <ClInclude Include="hdr\gun.h" />
     <ClInclude Include="hdr\pch.h" />
     <ClInclude Include="hdr\player.h" />
+    <ClInclude Include="hdr\settings.h" />
     <ClInclude Include="hdr\sfmlExtension.h" />
     <ClInclude Include="hdr\staticEntity.h" />
     <ClInclude Include="hdr\textuers.h" />
