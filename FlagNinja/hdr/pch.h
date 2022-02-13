@@ -11,7 +11,6 @@
 #include <future>
 #include <filesystem>
 
-#include <Windows.h>
 
 #include "sfmlExtension.h"
 #include "textuers.h"

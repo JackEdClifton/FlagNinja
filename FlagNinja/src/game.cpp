@@ -646,16 +646,18 @@ void Game::handleInput() {
 	}
 
 	// user input for first player
-	if (GetAsyncKeyState('A')) players[0].moveLeft();
-	if (GetAsyncKeyState('D')) players[0].moveRight();
-	if (GetAsyncKeyState('S')) players[0].moveDown();
-	if ((GetAsyncKeyState('W') || GetAsyncKeyState(' '))) players[0].jump();
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) players[0].moveLeft();
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) players[0].moveRight();
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) players[0].moveDown();
+	if((sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))) players[0].jump();
 
 	// reset position for debugging
-	if (GetAsyncKeyState('R')) {
+#if _DEBUG
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
 		resetCamera();
 		players[0].setPosition(250.0f, 250.0f);
 	}
+#endif
 }
 
 
