@@ -22,6 +22,9 @@ class Game {
 	int score = 0;
 	bool gameEnded = true;
 
+	unsigned int totalCoins, collectedCoins, totalEnemies, killedEnemies;
+	float totalTimer = 0.0f;
+
 	sf::Font font;
 
 	void readMap(const std::string& filename);  // read and load map file

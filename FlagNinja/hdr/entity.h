@@ -6,11 +6,11 @@
 class Entity : public sf::Sprite {
 
 	enum class Animation : int {
-		stationary = 1 << 0,
-		right_1 = 1 << 1,
-		right_2 = 1 << 2,
-		left_1 = 1 << 3,
-		left_2 = 1 << 4
+		stationary,
+		right_1,
+		right_2,
+		left_1,
+		left_2
 	};
 
 protected:

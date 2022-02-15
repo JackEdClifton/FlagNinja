@@ -38,7 +38,8 @@ void Entity::updateAnimation(float deltaTime) {
 
 	if (animation == lastAnimation) return;
 
-	setTexture(*textures[(int)log2<int>((int)animation)]);
+	//setTexture(*textures[(int)log2<int>((int)animation)]);
+	setTexture(*textures[(int)animation]);
 }
 
 void Entity::updateGun(float deltaTime) {

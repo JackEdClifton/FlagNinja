@@ -1,4 +1,3 @@
-#pragma once
 
 #include "pch.h"
 #include "game.h"
@@ -377,6 +376,8 @@ void Game::readMap(const std::string& filename) {
 	float y = 0.0f;
 	const float step = 64.0f;
 
+	totalCoins = collectedCoins = totalEnemies = killedEnemies = 0;
+
 	// iterate though file
 	while (std::getline(file, line)) {
 		x = -step;
@@ -389,12 +390,18 @@ void Game::readMap(const std::string& filename) {
 			else if (chr == 'g') platforms.emplace_back(x, y, Textures::Grass);
 			else if (chr == 'd') platforms.emplace_back(x, y, Textures::Dirt);
 			else if (chr == 'f') flag.setPosition(x, y);
-			else if (chr == 'c') coins.emplace_back(x, y);
+			else if (chr == 'c') {
+				coins.emplace_back(x, y);
+				totalCoins += 1;
+			}
 			else if (chr == 'p') {
 				players.emplace_back(x, y);
 				containsPlayer = true;
 			}
-			else if (chr == '1') enemies.push_back(new Enemy(x, y));
+			else if (chr == '1') {
+				enemies.push_back(new Enemy(x, y));
+				totalEnemies += 1;
+			}
 		}
 		y += step;
 	}
@@ -416,7 +423,6 @@ void Game::readMap(const std::string& filename) {
 }
 
 void Game::updateGameAttributes() {
-	PROFILE;
 	timer.update();
 	mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 }
@@ -483,10 +489,10 @@ void Game::destroyEnemy(unsigned int index) {
 #endif
 	enemies[index] = enemies[enemies.size() - 1];
 	enemies.pop_back();
+	killedEnemies += 1;
 }
 
 void Game::updateDisplay() {
-	PROFILE;
 	drawObjects();
 	drawUI();
 
@@ -495,7 +501,6 @@ void Game::updateDisplay() {
 }
 
 void Game::drawObjects() {
-	PROFILE;
 	adjustCamera();
 
 	// platforms
@@ -525,11 +530,30 @@ void Game::drawObjects() {
 }
 
 void Game::drawUI() {
-	sf::Text scoreText("Score: " + std::to_string(score), font);
-	scoreText.setFillColor(sf::Color::White);
-	scoreText.setStyle(sf::Text::Bold);
-	scoreText.setPosition((float)(window::width - 200), 20.0f);
-	window.draw(scoreText);
+	sf::Text text;
+	text.setFont(font);
+	text.setFillColor(sf::Color::White);
+	text.setStyle(sf::Text::Bold);
+
+	text.setString("fps: " + std::to_string(int(1.0f / deltaTime)));
+	text.setPosition(50.0f, 20.0f);
+	window.draw(text);
+	
+	text.setString("Score: " + std::to_string(score));
+	text.setPosition(200.0f, 20.0f);
+	window.draw(text);
+
+	text.setString("Coins: " + std::to_string(collectedCoins) + "/" + std::to_string(totalCoins));
+	text.setPosition(450.0f, 20.0f);
+	window.draw(text);
+
+	text.setString("Coins: " + std::to_string(killedEnemies) + "/" + std::to_string(totalEnemies));
+	text.setPosition(700.0f, 20.0f);
+	window.draw(text);
+
+	text.setString("Timer: " + std::to_string(score));
+	text.setPosition(950.0f, 20.0f);
+	window.draw(text);
 }
 
 void Game::handleCollisions() {
@@ -598,6 +622,7 @@ exitBulletLoop:
 				score += 20;
 				coins[i] = coins[coins.size() - 1];
 				coins.pop_back();
+				collectedCoins += 1;
 			}
 		}
 	}
@@ -612,7 +637,6 @@ exitBulletLoop:
 }
 
 void Game::updateEntitys() {
-	PROFILE;
 	for (auto& obj : players) obj.update(deltaTime, mousePosition);
 	for (auto& obj : enemies) obj->update(deltaTime, players, platforms, bullets);
 	for (auto& obj : coins) obj.update(deltaTime);
@@ -620,7 +644,6 @@ void Game::updateEntitys() {
 }
 
 void Game::handleInput() {
-	PROFILE;
 
 	// sfml events
 	sf::Event sfEvent;

@@ -3,7 +3,6 @@
 #include "game.h"
 
 int main() {
-	START_PROFILE;
 	
 	// setup
 	Textures::init();
@@ -11,7 +10,6 @@ int main() {
 	game.mainMenu();
 
 
-	END_PROFILE;
 	std::cout << "\n[Program Finished]";
 	std::cin.get();
 }

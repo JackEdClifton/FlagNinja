@@ -2,7 +2,7 @@
 
 #include "entity.h"
 #include "player.h"
-#include "StaticEntity.h"
+#include "staticEntity.h"
 
 class Enemy : public Entity {
 public:
