@@ -10,9 +10,9 @@
 #include <thread>
 #include <future>
 #include <filesystem>
-
+#include <cmath>
 
 #include "sfmlExtension.h"
 #include "textuers.h"
 
-#include "profiler.h"
+//#include "profiler.h"

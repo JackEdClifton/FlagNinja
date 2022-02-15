@@ -18,7 +18,7 @@ void Gun::aimTowards(const sf::Vector2f& target) {
 
 	// set unit vector
 	if (vector.x || vector.y)
-		unitVector = vector / sqrt(vector.x * vector.x + vector.y * vector.y);
+		unitVector = vector / (float)sqrt(vector.x * vector.x + vector.y * vector.y);
 
 	// set angle
 	angle = atan(vector.y / vector.x) * 180.0f / 3.1415926f;
