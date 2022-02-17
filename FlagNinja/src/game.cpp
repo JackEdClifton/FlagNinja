@@ -2,6 +2,7 @@
 #include "pch.h"
 #include "game.h"
 
+// container for window attributes
 namespace window {
 	const char* title = "Flag Ninja";
 	const int frameRate = 120;
@@ -17,28 +18,48 @@ namespace window {
 #endif
 }
 
+// container for game settings
 namespace settings {
 	bool isVsyncEnabled = true;
 	bool hardMode = false;
+	bool playMusic = false;
 
-
-	bool* options[] = { &isVsyncEnabled, &hardMode };
+	bool* options[] = { &isVsyncEnabled, &hardMode, &playMusic };
 }
 
+// game constructor
 Game::Game() {
+
+	// load font
 	font.loadFromFile("./assets/fonts/comic.ttf");
+
+	// load background image
+	background.setTexture(Textures::Background);
+	background.setSize((sf::Vector2f)Textures::Background->getSize());
+	background.setPosition(-500.0f, -500.0f);
+	
+	// load background audio
+	backgroundMusicBuffer.loadFromFile("./assets/audio/project 1.wav");
+	backgroundMusic.setBuffer(backgroundMusicBuffer);
+	backgroundMusic.setVolume(20.0f);
+	backgroundMusic.setLoop(true);
+	
+	// apply settings if necacerry
 	window.setVerticalSyncEnabled(settings::isVsyncEnabled);
+	if (settings::playMusic) backgroundMusic.play();
 }
 
+// game deconstructor
 Game::~Game() {
 	for (auto& obj : enemies) delete obj;
 	for (auto& obj : bullets) delete obj;
 	Textures::destroy();
 }
 
+// game loop for main menu
 void Game::mainMenu() {
 
-	// logo objects
+	// setup logo objects
 	sf::Texture logoTexture;
 	sf::RectangleShape logo;
 	logoTexture.loadFromFile("./assets/mainMenu/logo.psd");
@@ -49,12 +70,13 @@ void Game::mainMenu() {
 		20.0f
 	);
 
-	// button objects
+	// setup button objects
 	sf::RectangleShape button;
 	sf::Text buttonText;
 	buttonText.setFont(font);
 	buttonText.setFillColor(sf::Color::Black);
 
+	// setup position and size for options
 	float width = window::width / 5.0f;
 	float height = window::height / 10.0f;
 	float xPos = (window::width - width) / 2.0f;
@@ -62,57 +84,55 @@ void Game::mainMenu() {
 
 	const char* optionNames[] = { "Continue", "Select Level", "Settings" };
 
+	// game loop
 	while (window.isOpen()) {
 
+		// get mouse position and button state
 		mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 		bool mouseButtonDown = false;
 
+		// sfml events
 		sf::Event sfEvent;
 		while (window.pollEvent(sfEvent)) {
 
-			// close window button
-			if (sfEvent.type == sf::Event::Closed)
-				window.close();
-
-			// close window for full screens
+			// close window
 			if (sfEvent.type == sf::Event::KeyPressed)
 				if (sfEvent.key.code == sf::Keyboard::Escape)
-					window.close();
+					return;
 
-			// shooting button
+			// check if shooting button has been clicked
 			if (sfEvent.type == sf::Event::MouseButtonPressed && sfEvent.mouseButton.button == sf::Mouse::Left)
 				mouseButtonDown = true;
 
 		}
 
-
+		// draw boxes and text for options
 		for (int i = 0; i < 3; i++) {
 
-			// draw button background
-			button.setFillColor(sf::Color(0xff2222ff));
-			button.setPosition(xPos - 10.0f, yPos - 10.0f + (height + 50.0f) * i);
-			button.setSize({ width + 20.0f, height + 20.0f });
+			// set default button variables
+			button.setFillColor(sf::Color(0xdd2222ff));
+			button.setPosition(xPos, yPos + (height + 50.0f) * i);
+			button.setSize({ width, height });
+
 			if (sf::isPointWithinRect(mousePosition, button.getPosition(), { width, height })) {
+				
+				// set mouse hovering button variables
+				button.setFillColor(sf::Color(0xff2222ff));
+				button.setPosition(xPos - 10.0f, yPos - 10.0f + (height + 50.0f) * i);
+				button.setSize({ width + 20.0f, height + 20.0f });
+
+				// if user has clicked perform an action
 				if (mouseButtonDown) {
-					if (i == 0) {
-						playMap("0.txt");
-					}
-					else if (i == 1) {
+					if (i == 0)
+						playMap("1.txt");
+					else if (i == 1)
 						levelSelection();
-					}
-					else if (i == 2) {
+					else if (i == 2)
 						settings();
-					}
 				}
+			}
 
-			}
-			else {
-				button.setFillColor(sf::Color(0xdd2222ff));
-				button.setPosition(xPos, yPos + (height + 50.0f) * i);
-				button.setSize({ width, height });
-			}
 			window.draw(button);
-
 
 			// draw text
 			buttonText.setString(optionNames[i]);
@@ -133,24 +153,25 @@ void Game::mainMenu() {
 	}
 }
 
+// game loop to play a level
 void Game::playMap(const std::string& map) {
 
+	// load a map
 	readMap(map);
-
-	window.setView(sf::View(sf::FloatRect(0.0f, 0.0f, (float)window.getSize().x, (float)window.getSize().y)));
+	
+	// game loop for main game
 	gameEnded = false;
+	totalTimer = 0.0f;
 	while (window.isOpen() && !gameEnded) {
 		updateGameAttributes();  // update timer and mouse values
 		handleInput();  // handle input from the user
 		handleCollisions();  // handle collisions for all collidable objects
 		updateDisplay();  // draw objects and UI to window
-		updateEntitys();
+		updateEntitys();  // call update method for game objects
 	}
-
-	// reset display incase it was adjusted
-	window.setView(sf::View(sf::FloatRect(0.0f, 0.0f, (float)window::width, (float)window::height)));
 }
 
+// game loop to select a level
 void Game::levelSelection() {
 
 	sf::Texture logoTexture;
@@ -176,10 +197,6 @@ void Game::levelSelection() {
 
 		sf::Event sfEvent;
 		while (window.pollEvent(sfEvent)) {
-
-			// close window button
-			if (sfEvent.type == sf::Event::Closed)
-				window.close();
 
 			// close window for full screens
 			if (sfEvent.type == sf::Event::KeyPressed)
@@ -256,6 +273,7 @@ void Game::levelSelection() {
 	}
 }
 
+// game loop to modify game settings
 void Game::settings() {
 	sf::Texture logoTexture;
 	sf::RectangleShape logo;
@@ -269,7 +287,7 @@ void Game::settings() {
 	buttonText.setFont(font);
 	buttonText.setFillColor(sf::Color::Black);
 
-	const char* optionNames[] = { "V Sync", "Hard Mode" };
+	const char* optionNames[] = { "V Sync", "Hard Mode", "Background Music" };
 
 	float scroll = 0.0f;
 
@@ -281,10 +299,6 @@ void Game::settings() {
 
 		sf::Event sfEvent;
 		while (window.pollEvent(sfEvent)) {
-
-			// close window button
-			if (sfEvent.type == sf::Event::Closed)
-				window.close();
 
 			// close window for full screens
 			if (sfEvent.type == sf::Event::KeyPressed)
@@ -307,29 +321,35 @@ void Game::settings() {
 
 		}
 
-		float width = window::width / 5.0f;
-		float height = window::height / 10.0f;
-		float xPos = (window::width - width) / 2.0f;
-		float yPos = window::height / 2.0f;
+		const float width = window::width / 5.0f;
+		const float height = window::height / 10.0f;
+		const float xPos = (window::width - width) / 2.0f;
+		const float yPos = window::height / 5.0f;
 
 		// draw options
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 3; i++) {
 
-			// draw button background
+			// set colour
 			if (*settings::options[i])
 				button.setFillColor(sf::Color(0x22ff22ff));
 			else
 				button.setFillColor(sf::Color(0xdd2222ff));
 
 
+			// draw button background
 			button.setPosition(xPos - 10.0f, yPos - 10.0f + (height + 50.0f) * i);
 			button.setSize({ width + 20.0f, height + 20.0f });
 			if (sf::isPointWithinRect(mousePosition, button.getPosition(), { width, height })) {
 				if (mouseButtonDown) {
 					*settings::options[i] = !*settings::options[i];
-					if (i == 0) {
+					if (i == 0)
 						window.setVerticalSyncEnabled(settings::isVsyncEnabled);
+					
+					if (i == 2) {
+						if (settings::playMusic) backgroundMusic.play();
+						else backgroundMusic.pause();
 					}
+
 				}
 
 			}
@@ -358,6 +378,7 @@ void Game::settings() {
 	}
 }
 
+// construct objects for a map into memory
 void Game::readMap(const std::string& filename) {
 
 	// clear objects
@@ -422,11 +443,14 @@ void Game::readMap(const std::string& filename) {
 	for (auto& enemy : enemies) enemy->moveRight();
 }
 
+// update timer and mouse position
 void Game::updateGameAttributes() {
 	timer.update();
+	totalTimer += deltaTime;
 	mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 }
 
+// move all drawable objects by a fixed amount
 void Game::moveObjects(const sf::Vector2f& displacement) {
 	for (auto& obj : players) obj.move(displacement);
 	for (auto& obj : enemies) obj->move(displacement);
@@ -434,9 +458,11 @@ void Game::moveObjects(const sf::Vector2f& displacement) {
 	for (auto& obj : platforms) obj.move(displacement);
 	for (auto& obj : coins) obj.move(displacement);
 	flag.move(displacement);
+	background.move(displacement* sf::Vector2f(0.0f, 0.2f));  // moving the background, but only a little
 	overallCameraDisplacement += displacement;
 }
 
+// move all objects so player fits in frame
 void Game::adjustCamera() {
 
 	// get positions and sizes
@@ -465,41 +491,35 @@ void Game::adjustCamera() {
 	moveObjects(camera);
 }
 
+// reset camera to default position - debug
 void Game::resetCamera() {
 	moveObjects(-overallCameraDisplacement);
 }
 
+// destroy a bullet object
 void Game::destroyBullet(unsigned int index) {
-#if _DEBUG
-	if (index >= bullets.size()) {
-		std::cerr << "WARNING! - Bullet index out of range!\n";
-		return;
-	}
-#endif
 	bullets[index] = bullets[bullets.size() - 1];
 	bullets.pop_back();
 }
 
+// destroy an enemy object
 void Game::destroyEnemy(unsigned int index) {
-#if _DEBUG
-	if (index >= enemies.size()) {
-		std::cerr << "WARNING! - Enemy index out of range!\n";
-		return;
-	}
-#endif
 	enemies[index] = enemies[enemies.size() - 1];
 	enemies.pop_back();
 	killedEnemies += 1;
 }
 
+// draw objects and UI
 void Game::updateDisplay() {
 	drawObjects();
 	drawUI();
 
 	window.display();
 	window.clear(sf::Color(30, 50, 240));
+	//window.draw(background);
 }
 
+// draw objects to the screen
 void Game::drawObjects() {
 	adjustCamera();
 
@@ -529,33 +549,42 @@ void Game::drawObjects() {
 	window.draw(flag);
 }
 
+// draw the UI (text)
 void Game::drawUI() {
+
+	// setup text object
 	sf::Text text;
 	text.setFont(font);
 	text.setFillColor(sf::Color::White);
 	text.setStyle(sf::Text::Bold);
 
+	// fps counter
 	text.setString("fps: " + std::to_string(int(1.0f / deltaTime)));
 	text.setPosition(50.0f, 20.0f);
 	window.draw(text);
-	
+
+	// score counter
 	text.setString("Score: " + std::to_string(score));
 	text.setPosition(200.0f, 20.0f);
 	window.draw(text);
 
+	// coins counter
 	text.setString("Coins: " + std::to_string(collectedCoins) + "/" + std::to_string(totalCoins));
 	text.setPosition(450.0f, 20.0f);
 	window.draw(text);
 
-	text.setString("Coins: " + std::to_string(killedEnemies) + "/" + std::to_string(totalEnemies));
+	// enemy counter
+	text.setString("Enemies: " + std::to_string(killedEnemies) + "/" + std::to_string(totalEnemies));
 	text.setPosition(700.0f, 20.0f);
 	window.draw(text);
 
-	text.setString("Timer: " + std::to_string(score));
+	// game timer
+	text.setString("Timer: " + std::to_string(int(totalTimer)) + "." + std::to_string(int(totalTimer*10.0f) % 10));
 	text.setPosition(950.0f, 20.0f);
 	window.draw(text);
 }
 
+// find collisions and handle them apropriately
 void Game::handleCollisions() {
 
 	// players
@@ -636,6 +665,7 @@ exitBulletLoop:
 	}
 }
 
+// call update method for game objects
 void Game::updateEntitys() {
 	for (auto& obj : players) obj.update(deltaTime, mousePosition);
 	for (auto& obj : enemies) obj->update(deltaTime, players, platforms, bullets);
@@ -643,25 +673,18 @@ void Game::updateEntitys() {
 	flag.update(deltaTime);
 }
 
+// handle sfml events and player movement for main game
 void Game::handleInput() {
 
 	// sfml events
 	sf::Event sfEvent;
 	while (window.pollEvent(sfEvent)) {
 
-		// close window button
-		if (sfEvent.type == sf::Event::Closed)
-			window.close();
-
 		// close game -> pause menu
 		if (sfEvent.type == sf::Event::KeyPressed)
 			if (sfEvent.key.code == sf::Keyboard::Escape)
 				gameEnded = true;
 
-		// update the view to the new size of the window
-		//if (sfEvent.type == sf::Event::Resized) {
-		//	window.setView(sf::View(sf::FloatRect(0, 0, sfEvent.size.width, sfEvent.size.height)));
-		//}
 
 		// shooting button
 		if (sfEvent.type == sf::Event::MouseButtonPressed && sfEvent.mouseButton.button == sf::Mouse::Left)
@@ -672,15 +695,7 @@ void Game::handleInput() {
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) players[0].moveLeft();
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) players[0].moveRight();
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) players[0].moveDown();
-	if((sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space))) players[0].jump();
-
-	// reset position for debugging
-#if _DEBUG
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::R)) {
-		resetCamera();
-		players[0].setPosition(250.0f, 250.0f);
-	}
-#endif
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) players[0].jump();
 }
 
 

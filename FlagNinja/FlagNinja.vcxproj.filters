@@ -59,9 +59,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="assets\maps\0.txt" />
     <Text Include="assets\maps\1.txt" />
+    <Text Include="assets\maps\2.txt" />
     <Text Include="assets\maps\Impossible.txt" />
+    <Text Include="assets\maps\3.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\player\player_0.psd" />
@@ -81,6 +82,7 @@
     <None Include="assets\world\flag_0.psd" />
     <None Include="assets\world\flag_1.psd" />
     <None Include="assets\mainMenu\logo.psd" />
+    <None Include="assets\world\background.psd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hdr\entity.h">
@@ -128,5 +130,10 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\fonts\comic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="assets\audio\project 1.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
   </ItemGroup>
 </Project>

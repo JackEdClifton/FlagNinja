@@ -218,8 +218,9 @@
     <ClCompile Include="src\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="assets\maps\0.txt" />
     <Text Include="assets\maps\1.txt" />
+    <Text Include="assets\maps\2.txt" />
+    <Text Include="assets\maps\3.txt" />
     <Text Include="assets\maps\Impossible.txt" />
   </ItemGroup>
   <ItemGroup>
@@ -232,6 +233,7 @@
     <None Include="assets\player\player_2.psd" />
     <None Include="assets\player\player_3.psd" />
     <None Include="assets\player\player_4.psd" />
+    <None Include="assets\world\background.psd" />
     <None Include="assets\world\coin_0.psd" />
     <None Include="assets\world\coin_1.psd" />
     <None Include="assets\world\coin_2.psd" />
@@ -264,6 +266,9 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\fonts\comic.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="assets\audio\project 1.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

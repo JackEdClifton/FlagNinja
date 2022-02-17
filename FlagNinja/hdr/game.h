@@ -26,6 +26,11 @@ class Game {
 	float totalTimer = 0.0f;
 
 	sf::Font font;
+	sf::RectangleShape background;
+
+	// audio
+	sf::SoundBuffer backgroundMusicBuffer;
+	sf::Sound backgroundMusic;
 
 	void readMap(const std::string& filename);  // read and load map file
 	void adjustCamera();  // move all drawable objects to keep player within window
