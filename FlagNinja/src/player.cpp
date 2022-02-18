@@ -21,6 +21,11 @@ void Player::initTextures() {
 }
 
 void Player::update(float deltaTime, const sf::Vector2f& mousePosition) {
+	if (isPaused) return;
 	Entity::update(deltaTime);
 	gun.aimTowards(mousePosition);
 }
+
+bool Player::getPaused() const { return isPaused; }
+void Player::setPaused(bool value) { isPaused = value; }
+void Player::flipPausedState() { isPaused = !isPaused; }

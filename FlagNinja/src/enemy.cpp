@@ -44,6 +44,10 @@ void Enemy::update(float deltaTime, const std::vector<Player>& players, const st
 
 	// find closest player
 	for (auto& player : players) {
+
+		if (player.getPaused())
+			continue;
+
 		if (!sf::isViewObstructed(*this, player, platforms)) {
 
 			const sf::Vector2f& distanceVector = player.getPosition() - getPosition();

@@ -57,12 +57,18 @@
     <ClCompile Include="src\flag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\gameLoops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gameUserData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\maps\1.txt" />
     <Text Include="assets\maps\2.txt" />
-    <Text Include="assets\maps\Impossible.txt" />
     <Text Include="assets\maps\3.txt" />
+    <Text Include="assets\maps\4.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\player\player_0.psd" />
@@ -82,7 +88,6 @@
     <None Include="assets\world\flag_0.psd" />
     <None Include="assets\world\flag_1.psd" />
     <None Include="assets\mainMenu\logo.psd" />
-    <None Include="assets\world\background.psd" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hdr\entity.h">

@@ -7,9 +7,8 @@ int main() {
 	// setup
 	Textures::init();
 	Game game;
-	game.mainMenu();
 
 	std::cout << "\n[Program Finished]";
-	std::cin.get();
+	//std::this_thread::sleep_for(std::chrono::seconds(2));
 }
 

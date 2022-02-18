@@ -3,8 +3,6 @@
 
 namespace Textures {
 
-	extern sf::Texture* Background;
-
 	extern sf::Texture* Player_0;
 	extern sf::Texture* Player_1;
 	extern sf::Texture* Player_2;

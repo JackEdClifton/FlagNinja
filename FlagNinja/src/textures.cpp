@@ -2,8 +2,6 @@
 #include "pch.h"
 
 namespace Textures {
-	sf::Texture* Background;
-
 	sf::Texture* Player_0;
 	sf::Texture* Player_1;
 	sf::Texture* Player_2;
@@ -25,8 +23,6 @@ namespace Textures {
 	sf::Texture* Bullet;
 
 	bool init() {
-		Background = new sf::Texture();
-
 		Player_0 = new sf::Texture();
 		Player_1 = new sf::Texture();
 		Player_2 = new sf::Texture();
@@ -49,8 +45,6 @@ namespace Textures {
 
 
 		bool allLoaded = true;
-		allLoaded &= Background->loadFromFile("./assets/world/background.psd");
-
 		allLoaded &= Player_0->loadFromFile("./assets/player/player_0.psd");
 		allLoaded &= Player_1->loadFromFile("./assets/player/player_1.psd");
 		allLoaded &= Player_2->loadFromFile("./assets/player/player_2.psd");
