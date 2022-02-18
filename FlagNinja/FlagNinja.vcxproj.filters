@@ -88,6 +88,8 @@
     <None Include="assets\world\flag_0.psd" />
     <None Include="assets\world\flag_1.psd" />
     <None Include="assets\mainMenu\logo.psd" />
+    <None Include="user\userdata.jcf" />
+    <None Include="openal32.dll" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hdr\entity.h">

@@ -243,6 +243,8 @@
     <None Include="assets\world\flag_1.psd" />
     <None Include="assets\world\floorTile.psd" />
     <None Include="assets\world\grass.psd" />
+    <None Include="openal32.dll" />
+    <None Include="user\userdata.jcf" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hdr\bullet.h" />
