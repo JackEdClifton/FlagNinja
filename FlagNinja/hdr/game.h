@@ -23,6 +23,7 @@ namespace settings {
 	extern bool playMusic;
 
 	extern bool* options[];
+	const char* optionNames[];
 }
 
 // user data for a single level/map
@@ -41,18 +42,6 @@ struct UserData {
 
 	UserData() {
 		levels.emplace_back(true, 0, 0.0f);
-	}
-
-	void print() {
-		std::cout << std::fixed;
-		std::cout << "Total: " << totalPoints << std::endl;
-		for (auto& level : levels) {
-			std::cout <<
-				"isUnlocked: " << level.isUnlocked <<
-				"\thighScore: " << level.highScore <<
-				"\tbestTime: " << level.bestTime <<
-				std::endl;
-		}
 	}
 };
 
@@ -74,25 +63,37 @@ private:
 	Timer timer;
 	const float& deltaTime = timer.getDeltaTime();
 
-	// game modes
-	enum class Mode {
-		mainMenu, mainGame, levelSelection, settings, gameWon
-	};
-	Mode gameMode = Mode::mainMenu;
-
-
 	// game modes and data
-	bool mouseButtonDown = false;
-	sf::Vector2f overallCameraDisplacement = { 0.0f, 0.0f };
-	sf::Vector2f mousePosition;
 	UserData userdata;
+	
+	enum class Mode { mainMenu, mainGame, levelSelection, settings, gameWon };
+	Mode gameMode = Mode::mainMenu;
+	
+	enum class NetworkState { hostMenu, clientMenu, hostGame, clientGame };
+	NetworkState networkMode = NetworkState::hostMenu;
+
+	// thread for networking
+	std::thread networkThread;
+	bool threadActive = false;
+	
+	// camera
+	sf::Vector2f overallCameraDisplacement = { 0.0f, 0.0f };
+	float maxFallHeight = 0.0f;
+
+	// map
 	std::vector<std::string> maps;
 	int currentMapIndex = 0;
+
+	// mouse info
+	bool mouseButtonDown = false;
+	sf::Vector2f mousePosition;
 
 	// user interface
 	int score = 0;
 	unsigned int totalCoins, collectedCoins, totalEnemies, killedEnemies;
 	float totalTimer = 0.0f;
+
+	// font
 	sf::Font font;
 
 	// audio
@@ -107,12 +108,16 @@ private:
 	std::vector<Coin> coins;
 	Flag flag;
 
+	// new objects to send to networked devices
+	std::vector<Bullet*> newBullets;
+
 
 	// game loops
 	void mainMenu();
 	void playGame(const std::string& map);
 	void levelSelection();
 	void settings();
+	void networkLoop();
 
 	// seperated gameloop functions
 	void updateGameAttributes(); // update timer and mouse values
@@ -127,13 +132,16 @@ private:
 	void moveObjects(const sf::Vector2f& displacement);
 	void drawPauseMenu();  // draw dimming and options for in-game pause menu
 	void drawObjects();  // draw objects
-	void drawUI(bool fpsOnly = false);  // draw user interface
+	void drawUI();  // draw user interface
 	void destroyBullet(unsigned int index);
 	void destroyEnemy(unsigned int index);
 	void loadUserData();
 	void saveUserData();
 
-
+	// networking
+	static void listen(bool& threadActive);
+	static void server(bool& threadActive);
+	static void client(bool& threadActive);
 
 
 };

@@ -9,7 +9,7 @@ class Coin : public StaticEntity {
 	// animation
 	int animation = 0;
 	float animationCooldown = 0.0f;
-	float animationMaxCooldown = 0.5f;
+	float animationMaxCooldown = 0.2f;
 
 	void updateAnimation(float deltaTime);
 

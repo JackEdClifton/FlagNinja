@@ -129,11 +129,11 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
-      <Optimization>MaxSpeed</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -180,8 +180,8 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
-      <Optimization>MaxSpeed</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -194,11 +194,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\bullet.cpp" />
+    <ClCompile Include="src\button.cpp" />
     <ClCompile Include="src\coin.cpp" />
+    <ClCompile Include="src\colour.cpp" />
+    <ClCompile Include="src\connection.cpp" />
     <ClCompile Include="src\enemy.cpp" />
     <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\flag.cpp" />
     <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\gameDraw.cpp" />
     <ClCompile Include="src\gameLoops.cpp" />
     <ClCompile Include="src\gameUserData.cpp" />
     <ClCompile Include="src\gun.cpp" />
@@ -224,6 +228,7 @@
     <Text Include="assets\maps\2.txt" />
     <Text Include="assets\maps\3.txt" />
     <Text Include="assets\maps\4.txt" />
+    <Text Include="assets\maps\5.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\enemy\enemy_1.psd" />
@@ -244,11 +249,14 @@
     <None Include="assets\world\floorTile.psd" />
     <None Include="assets\world\grass.psd" />
     <None Include="openal32.dll" />
-    <None Include="user\userdata.jcf" />
+    <None Include="_user\_userdata.jcf" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hdr\bullet.h" />
+    <ClInclude Include="hdr\button.h" />
     <ClInclude Include="hdr\coin.h" />
+    <ClInclude Include="hdr\colour.h" />
+    <ClInclude Include="hdr\connection.h" />
     <ClInclude Include="hdr\enemy.h" />
     <ClInclude Include="hdr\entity.h" />
     <ClInclude Include="hdr\flag.h" />

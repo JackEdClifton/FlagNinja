@@ -7,8 +7,13 @@
 void Game::loadUserData() {
 
 	// open file
-	std::string data;
 	std::ifstream file("./user/userdata.jcf");
+
+	// create a user folder if it does not exist
+	if (file.fail())
+		std::filesystem::create_directory("./user");
+
+	std::string data;
 	std::getline(file, data);
 
 	// validate the line is the correct size

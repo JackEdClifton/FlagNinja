@@ -2,13 +2,15 @@
 #include "pch.h"
 #include "game.h"
 
+#include "colour.h"
+#include "button.h"
+
 // container for window attributes
 namespace window {
 	const char* title = "Flag Ninja";
-	//const int frameRate = 120;
 
 #if _DEBUG
-	unsigned int width = 1000;
+	unsigned int width = 1400;
 	unsigned int height = 600;
 	unsigned int style = sf::Style::Close;
 #else
@@ -25,6 +27,7 @@ namespace settings {
 	bool playMusic = false;
 
 	bool* options[] = { &isVsyncEnabled, &hardMode, &playMusic };
+	const char* optionNames[] = { "V Sync", "Hard Mode", "Background Music" };
 }
 
 // game constructor
@@ -67,6 +70,10 @@ Game::~Game() {
 	for (auto& obj : enemies) delete obj;
 	for (auto& obj : bullets) delete obj;
 	Textures::destroy();
+	
+	// end network threads
+	threadActive = false;
+	networkThread.joinable() ? networkThread.join() : void();
 
 	// make sure window is closed
 	window.close();
@@ -74,8 +81,6 @@ Game::~Game() {
 
 // construct objects for a map into memory
 void Game::readMap(const std::string& filename) {
-
-	std::cout << "Loading: " << filename << std::endl;
 
 	// clear objects
 	players.clear();
@@ -104,25 +109,42 @@ void Game::readMap(const std::string& filename) {
 
 			// handle each character
 			if (chr == ' ') continue;
+			
+			// platforms
 			else if (chr == 'g') platforms.emplace_back(x, y, Textures::Grass);
 			else if (chr == 'd') platforms.emplace_back(x, y, Textures::Dirt);
+			else if (chr == 's') platforms.emplace_back(x, y, Textures::Snow);
+			else if (chr == 'b') platforms.emplace_back(x, y, Textures::SnowDirt);
+
+			// env
 			else if (chr == 'f') flag.setPosition(x, y);
 			else if (chr == 'c') {
 				coins.emplace_back(x, y);
 				totalCoins += 1;
 			}
+
+			// player
 			else if (chr == 'p') {
 				players.emplace_back(x, y);
 				containsPlayer = true;
 			}
+
+			// enemies
 			else if (chr == '1') {
-				enemies.push_back(new Enemy(x, y));
+				enemies.push_back(new BadPerson(x, y));
+				totalEnemies += 1;
+			}
+			else if (chr == '2') {
+				enemies.push_back(new BadPenguin(x, y));
 				totalEnemies += 1;
 			}
 		}
 		y += step;
 	}
 	file.close();
+
+	// maximun height user can fall before dying
+	maxFallHeight = step + 3000.0f;
 
 	// log an error if a player has not been created
 	if (!containsPlayer) {
@@ -142,7 +164,7 @@ void Game::readMap(const std::string& filename) {
 // update timer and mouse position
 void Game::updateGameAttributes() {
 	timer.update();
-	if (gameMode == Mode::mainMenu)
+	if (gameMode == Mode::mainGame)
 		totalTimer += deltaTime;
 	mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 	mouseButtonDown = false;
@@ -157,6 +179,7 @@ void Game::moveObjects(const sf::Vector2f& displacement) {
 	for (auto& obj : coins) obj.move(displacement);
 	flag.move(displacement);
 	overallCameraDisplacement += displacement;
+	maxFallHeight += displacement.y;
 }
 
 // move all objects so player fits in frame
@@ -206,153 +229,6 @@ void Game::destroyEnemy(unsigned int index) {
 	killedEnemies += 1;
 }
 
-// draw options for in-game pause menu
-void Game::drawPauseMenu() {
-	if (!players[0].getPaused()) return;
-
-	// dim screen
-	sf::RectangleShape dimRect(sf::Vector2f((float)window::width, (float)window::height));
-	dimRect.setFillColor(sf::Color(0, 0, 0, 100));
-	window.draw(dimRect);
-
-	// setup button objects
-	sf::RectangleShape button;
-	sf::Text buttonText;
-	buttonText.setFont(font);
-	buttonText.setFillColor(sf::Color::Black);
-
-	// setup position and size for options
-	float width = window::width / 5.0f;
-	float height = window::height / 10.0f;
-	float xPos = (window::width - width) / 2.0f;
-	float yPos = window::height / 4.0f;
-
-	const char* optionNames[] = { "Continue", "Settings", "Main Menu" };
-
-	// draw boxes and text for options
-	for (int i = 0; i < 3; i++) {
-
-		// set default button variables
-		button.setFillColor(sf::Color(0xdd2222ff));
-		button.setPosition(xPos, yPos + (height + 50.0f) * i);
-		button.setSize({ width, height });
-
-		// check if mouse is inside a button
-		if (sf::isPointWithinRect(mousePosition, button.getPosition(), { width, height })) {
-
-			// set variables for mouse hovering
-			button.setFillColor(sf::Color(0xff2222ff));
-			button.setPosition(xPos - 10.0f, yPos - 10.0f + (height + 50.0f) * i);
-			button.setSize({ width + 20.0f, height + 20.0f });
-
-			// if user has clicked perform an action
-			if (mouseButtonDown) {
-
-				// continue
-				if (i == 0)
-					players[0].setPaused(false);
-
-				// settings
-				else if (i == 1) {
-					settings();
-					gameMode = Mode::mainGame;
-				}
-
-				// exit to main menu
-				else if (i == 2)
-					gameMode = Mode::mainMenu;
-			}
-		}
-
-		window.draw(button);
-
-		// draw text
-		buttonText.setString(optionNames[i]);
-		buttonText.setPosition(
-			xPos + (width - buttonText.getGlobalBounds().width) / 2.0f,
-			(yPos + (height + 50.0f) * i) + (buttonText.getGlobalBounds().height) / 4.0f
-		);
-		window.draw(buttonText);
-
-	}
-
-
-}
-
-// draw objects to the screen
-void Game::drawObjects() {
-	adjustCamera();
-
-	// platforms
-	for (auto& platform : platforms)
-		if (isSpriteInWindow(platform, window))
-			window.draw(platform);
-
-	// players
-	for (auto& player : players) {
-		window.draw(player);
-		window.draw(player.gun);
-		player.drawHealthBar(&window);
-	}
-
-	// enemies
-	for (auto& enemy : enemies) {
-		window.draw(*enemy);
-		window.draw(enemy->gun);
-		enemy->drawHealthBar(&window);
-	}
-
-
-	for (auto& obj : bullets) window.draw(*obj);
-	for (auto& obj : coins) window.draw(obj);
-
-	window.draw(flag);
-}
-
-// draw the UI (text)
-void Game::drawUI(bool fpsOnly) {
-
-	// setup text object
-	sf::Text text;
-	text.setFont(font);
-	text.setFillColor(sf::Color::White);
-	text.setStyle(sf::Text::Bold);
-
-	// fps counter
-	text.setString("fps: " + std::to_string(int(1.0f / deltaTime)));
-	text.setPosition(50.0f, 20.0f);
-	window.draw(text);
-
-	// exit function if in a menu
-	if (gameMode != Mode::mainGame) {
-		
-	}
-
-
-	// draw options for main game only
-	else {
-
-		// score counter
-		text.setString("Score: " + std::to_string(score));
-		text.setPosition(200.0f, 20.0f);
-		window.draw(text);
-
-		// coins counter
-		text.setString("Coins: " + std::to_string(collectedCoins) + "/" + std::to_string(totalCoins));
-		text.setPosition(450.0f, 20.0f);
-		window.draw(text);
-
-		// enemy counter
-		text.setString("Enemies: " + std::to_string(killedEnemies) + "/" + std::to_string(totalEnemies));
-		text.setPosition(700.0f, 20.0f);
-		window.draw(text);
-
-		// game timer
-		text.setString("Timer: " + std::to_string(int(totalTimer)) + "." + std::to_string(int(totalTimer * 10.0f) % 10));
-		text.setPosition(950.0f, 20.0f);
-		window.draw(text);
-	}
-}
 
 // find collisions and handle them apropriately
 void Game::handleCollisions() {
@@ -367,6 +243,10 @@ void Game::handleCollisions() {
 		for (auto& platform : platforms)
 			player.checkCollision(deltaTime, platform);
 		player.resolveCollisions(deltaTime);
+
+		// if player has fell out of world exit game
+		if (player.getPosition().y > maxFallHeight)
+			gameMode = Mode::mainMenu;
 	}
 
 	// enemys
@@ -396,12 +276,12 @@ void Game::handleCollisions() {
 
 		// player
 		for (auto& player : players) {
-			
+
 			if (player.getPaused())
 				continue;
-			
+
 			if (isColliding(*bullets[i], player)) {
-				if (player.hit(0.2f + 1.0f * settings::hardMode)) {
+				if (player.hit(0.3f * player.damageMultiplier)) {
 					gameMode = Mode::mainMenu;
 				}
 				destroyBullet(i);
@@ -420,8 +300,10 @@ void Game::handleCollisions() {
 				goto exitBulletLoop;
 			}
 		}
+		continue;
+	exitBulletLoop:
+		i--;
 	}
-exitBulletLoop:
 
 	// coins
 	for (unsigned int j = 0; j < players.size(); j++) {

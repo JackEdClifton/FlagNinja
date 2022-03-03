@@ -2,7 +2,8 @@
 #include "pch.h"
 #include "game.h"
 
-
+#include "colour.h"
+#include "button.h"
 
 
 
@@ -14,22 +15,30 @@ void Game::mainMenu() {
 	sf::RectangleShape logo;
 	logoTexture.loadFromFile("./assets/mainMenu/logo.psd");
 	logo.setTexture(&logoTexture);
-	logo.setSize({ window::width / 2.0f, window::height / 2.0f });
-	logo.setPosition((window::width - logo.getSize().x) / 2, 20.0f);
-
-	// setup button objects
-	sf::RectangleShape button;
-	sf::Text buttonText;
-	buttonText.setFont(font);
-	buttonText.setFillColor(sf::Color::Black);
+	logo.setSize({ window::width / 3.0f, window::height / 3.0f });
+	logo.setPosition((window::width - logo.getSize().x) / 2.0f, 20.0f);
 
 	// setup position and size for options
 	float width = window::width / 5.0f;
 	float height = window::height / 10.0f;
 	float xPos = (window::width - width) / 2.0f;
-	float yPos = window::height / 2.0f;
+	float yPos = window::height / 3.0f;
 
-	const char* optionNames[] = { "Continue", "Select Level", "Settings" };
+	const char* optionNames[] = { "Continue", "Select Level", "Multiplayer", "Settings" };
+
+	// setup button objects
+	std::vector<Button> buttons;
+	for (int i = 0; i < 4; i++) {
+		Button button;
+		button.text.setString(optionNames[i]);
+		button.setColour(Colour::Button::LightGreen, Colour::Button::DarkGreen);
+		button.background.setSize({ width, height });
+		button.text.setFont(font);
+		button.setPosition(xPos, yPos + (height + 50.0f) * i);
+		buttons.push_back(button);
+	}
+	const int buttonsSize = buttons.size();
+
 
 	// game loop
 	while (window.isOpen()) {
@@ -56,32 +65,24 @@ void Game::mainMenu() {
 		}
 
 		// draw boxes and text for options
-		for (int i = 0; i < 3; i++) {
+		for (unsigned int i = 0; i < buttonsSize; i++) {
 
-			// set default button variables
-			button.setFillColor(sf::Color(0xdd2222ff));
-			button.setPosition(xPos, yPos + (height + 50.0f) * i);
-			button.setSize({ width, height });
-
-			if (sf::isPointWithinRect(mousePosition, button.getPosition(), { width, height })) {
-
-				// set mouse hovering button variables
-				button.setFillColor(sf::Color(0xff2222ff));
-				button.setPosition(xPos - 10.0f, yPos - 10.0f + (height + 50.0f) * i);
-				button.setSize({ width + 20.0f, height + 20.0f });
+			if (sf::isPointWithinRect(mousePosition, buttons[i].background.getPosition(), { width, height })) {
+				buttons[i].active();
 
 				// if user has clicked perform an action
 				if (mouseButtonDown) {
 					mouseButtonDown = false;
 
-					// continue
+					// continue button
 					if (i == 0) {
+						
 						// find first locked map
 						int latestUnlockedMap = 0;
-						while (userdata.levels[latestUnlockedMap].isUnlocked && latestUnlockedMap < maps.size())
+						while (userdata.levels[latestUnlockedMap].isUnlocked && latestUnlockedMap < maps.size()-1)
 							latestUnlockedMap++;
 
-						// go back to last unlocked map
+						// go back to the last unlocked map
 						latestUnlockedMap--;
 
 						// play the latest unloked map
@@ -89,26 +90,15 @@ void Game::mainMenu() {
 						playGame(maps[latestUnlockedMap]);
 					}
 
-					// level selection menu
-					else if (i == 1)
-						levelSelection();
-
-					// settings menu
-					else if (i == 2)
-						settings();
+					else if (i == 1) levelSelection();  // level selection menu
+					else if (i == 2) networkLoop();  // connect to other players
+					else if (i == 3) settings();  // settings menu
 				}
 			}
+			else
+				buttons[i].inactive();
 
-			window.draw(button);
-
-			// draw text
-			buttonText.setString(optionNames[i]);
-			buttonText.setPosition(
-				xPos + (width - buttonText.getGlobalBounds().width) / 2.0f,
-				(yPos + (height + 50.0f) * i) + (buttonText.getGlobalBounds().height) / 4.0f
-			);
-			window.draw(buttonText);
-
+			buttons[i].draw(window);
 		}
 
 		// draw
@@ -117,14 +107,9 @@ void Game::mainMenu() {
 
 		// update display
 		window.display();
-		window.clear(sf::Color(30, 50, 240));
+		window.clear(Colour::Background::Background);
 	}
 }
-
-
-
-
-
 
 
 
@@ -134,6 +119,7 @@ void Game::playGame(const std::string& map) {
 	// load a map
 	readMap(map);
 
+	// set default values
 	score = 0.0f;
 	totalTimer = 0.0f;
 	gameMode = Mode::mainGame;
@@ -149,32 +135,32 @@ void Game::playGame(const std::string& map) {
 
 		// draw
 		drawObjects();
-		drawUI(false);
+		drawUI();
 		drawPauseMenu();
 
 		// update display
 		window.display();
-		window.clear(sf::Color(30, 50, 240));
+		window.clear(Colour::Background::Background);
 	}
 	mouseButtonDown = false;
 
 	// save progress
 	if (gameMode == Mode::gameWon) {
 
+		// unlock next map
 		if (userdata.levels.size() > currentMapIndex + 1)
 			userdata.levels[currentMapIndex + 1].isUnlocked = true;
 
+		// save score and time
 		if (score > userdata.levels[currentMapIndex].highScore) {
 			userdata.levels[currentMapIndex].highScore = score;
 			userdata.levels[currentMapIndex].bestTime = totalTimer;
 		}
+
+		// write to file
+		saveUserData();
 	}
 }
-
-
-
-
-
 
 
 
@@ -188,13 +174,64 @@ void Game::levelSelection() {
 	logo.setSize({ window::width / 4.0f, window::height / 4.0f });
 	logo.setPosition(50.0f, 50.0f);
 
-	// not needed yet but we dont need this inside the game loop
 	// sizes and positons for level buttons
 	const float width = window::width / 6.0f;
 	const float height = window::height / 6.0f;
 	const float xPos = (window::width - width) / 4.0f;
 	const float yPos = 50.0f;
+
+	// scrolling variables
 	float scroll = 0.0f;
+	float overallScroll = 0.0f;
+	float maxScroll = 0.0f;
+
+	// array for button objects
+	std::vector<HighScoreButton> buttons;
+
+	// setup button objects
+	int row = 0;
+	int column = 1;
+
+	const int mapSize = maps.size();
+	for (int i = 0; i < mapSize; i++) {
+
+		// new button
+		HighScoreButton button;
+		button.setColour(Colour::Button::LightGreen, Colour::Button::DarkGreen);
+		button.background.setSize({ width, height });
+		button.text.setFont(font);
+		button.highScoreText.setFont(font);
+
+		// highscore text
+		button.highScoreText.setCharacterSize(15);
+
+
+		// set button position and colour
+		button.text.setString(maps[i].substr(0, maps[i].size() - 4));
+		button.setPosition(xPos + (width + 20.0f) * column, yPos + (height + 20.0f) * row - scroll);
+
+		// set highScore text attributes
+		if (userdata.levels[i].highScore)
+			button.highScoreText.setString("High Score: " + std::to_string(userdata.levels[i].highScore));
+		else
+			button.setColour(Colour::Button::LightRed, Colour::Button::DarkRed);
+
+		// setup button if level is dissabled
+		if (!userdata.levels[i].isUnlocked)
+			button.setColour(Colour::Button::LightGrey, Colour::Button::DarkGrey);
+
+		// update column and row values
+		if (column % 3)
+			column += 1;
+		else {
+			row += 1;
+			column = 1;
+		}
+
+		buttons.push_back(button);
+	}
+	const int buttonsSize = buttons.size();
+
 
 	// mainloop for level selection
 	gameMode = Mode::levelSelection;
@@ -216,12 +253,20 @@ void Game::levelSelection() {
 
 			// scroll through levels
 			if (sfEvent.type == sf::Event::MouseWheelMoved) {
+
+				// get scroll value
 				scroll -= sfEvent.mouseWheel.delta * 10.0f;
+				if (scroll + overallScroll < 0.0f) scroll = 0.0f;
+				if (scroll + overallScroll > maxScroll) scroll = maxScroll - overallScroll;
+				overallScroll += scroll;
 
-				const float maxScroll = 0.0f;
-
-				if (scroll < 0.0f) scroll = 0.0f;
-				if (scroll > maxScroll) scroll = maxScroll;
+				// move buttons
+				for (int i = 0; i < buttons.size(); i++) {
+					auto a = buttons[i].background.getPosition();
+					buttons[i].setPosition(a.x, a.y - scroll);
+				}
+				// reset scroll
+				scroll = 0.0f;
 			}
 
 			// shooting button
@@ -230,53 +275,15 @@ void Game::levelSelection() {
 
 		}
 
+		// draw buttons
+		for (int i = 0; i < buttonsSize; i++) {
 
-
-		// create button to draw options
-		sf::RectangleShape button({ width, height });
-		sf::Text buttonText;
-		buttonText.setFont(font);
-		buttonText.setFillColor(sf::Color::Black);
-
-		// highscore text
-		sf::Text highScoreText;
-		highScoreText.setFont(font);
-		highScoreText.setFillColor(sf::Color::Black);
-		highScoreText.setCharacterSize(15);
-
-		int row = 0;
-		int column = 1;
-
-		for (int i = 0l; i < maps.size(); i++) {
-
-			// set button position and colour
-			button.setPosition(xPos + (width + 20.0f) * column, yPos + (height + 20.0f) * row - scroll);
-			button.setFillColor(sf::Color(userdata.levels[i].highScore ? 0x22dd22ff : 0xdd2222ff));
-			
-			// set button text attributes
-			buttonText.setString(maps[i].substr(0, maps[i].size() - 4));
-			const sf::Vector2f textSize = { buttonText.getGlobalBounds().width , buttonText.getGlobalBounds().height };
-			buttonText.setPosition(button.getPosition() + (button.getSize() - textSize) / 2.0f);
-
-			// set highScore text attributes
-			if (userdata.levels[i].highScore) {
-				highScoreText.setPosition(xPos + (width + 20.0f) * column + 20.0f, yPos + (height + 20.0f) * row - scroll + 10.0f);
-				highScoreText.setString("High Score: " + std::to_string(userdata.levels[i].highScore));
-			}
-			else {
-				highScoreText.setString("");
-			}
-
-			// setup button if level is dissabled
-			if (!userdata.levels[i].isUnlocked) {
-				button.setFillColor(sf::Color(0x666666ee));
-			}
+			// assume the button is not hovered over
+			buttons[i].inactive();
 
 			// setup button if user is hovering with mouse
-			else if (sf::isPointWithinRect(mousePosition, button.getPosition(), button.getSize())) {
-
-				// set colour
-				button.setFillColor(sf::Color(userdata.levels[i].highScore ? 0x22ff22ff : 0xff2222ff));
+			if (userdata.levels[i].isUnlocked && sf::isPointWithinRect(mousePosition, buttons[i].background.getPosition(), buttons[i].background.getSize())) {
+				buttons[i].active();
 
 				// user clicking on an option
 				if (mouseButtonDown) {
@@ -288,35 +295,25 @@ void Game::levelSelection() {
 			}
 
 			// draw
-			window.draw(button);
-			window.draw(highScoreText);
-			window.draw(buttonText);
-
-			// update column and row values
-			if (column % 3) {
-				column += 1;
-			}
-			else {
-				row += 1;
-				column = 1;
-			}
+			buttons[i].draw(window);
 		}
 
 		// draw title name and UI
 		window.draw(logo);
 		drawUI();
 
+		// update window
 		window.display();
-		window.clear(sf::Color(30, 50, 240));
+		window.clear(Colour::Background::Background);
 	}
 }
 
 
 
-
-
 // game loop to modify game settings
 void Game::settings() {
+
+	// load logo texture
 	sf::Texture logoTexture;
 	sf::RectangleShape logo;
 	logoTexture.loadFromFile("./assets/mainMenu/logo.psd");
@@ -324,14 +321,33 @@ void Game::settings() {
 	logo.setSize({ window::width / 4.0f, window::height / 4.0f });
 	logo.setPosition(50.0f, 50.0f);
 
-	sf::RectangleShape button;
-	sf::Text buttonText;
-	buttonText.setFont(font);
-	buttonText.setFillColor(sf::Color::Black);
+	// size and position for buttons
+	const float width = window::width / 5.0f;
+	const float height = window::height / 10.0f;
+	const float xPos = (window::width - width) / 2.0f;
+	const float yPos = window::height / 5.0f;
 
-	const char* optionNames[] = { "V Sync", "Hard Mode", "Background Music" };
+	// setup button objects
+	std::vector<Button> buttons;
+	for (int i = 0; i < 3; i++) {
+		Button button;
+		button.text.setFont(font);
+		button.background.setSize({ width, height });
+		button.text.setString(settings::optionNames[i]);
+		button.setPosition(xPos, yPos + (height + 50.0f) * i);
+
+		// set colour
+		*settings::options[i]
+			? button.setColour(Colour::Button::LightGreen, Colour::Button::DarkGreen)  // green, on
+			: button.setColour(Colour::Button::LightRed, Colour::Button::DarkRed);  // red, off
+
+		buttons.push_back(button);
+	}
+	const int buttonsSize = buttons.size();
 
 	float scroll = 0.0f;
+	float overallScroll = 0.0f;
+	const float maxScroll = 0.0f;
 
 	// mainloop for level selection
 	gameMode = Mode::settings;
@@ -349,12 +365,20 @@ void Game::settings() {
 
 			// scroll through levels
 			if (sfEvent.type == sf::Event::MouseWheelMoved) {
+
+				// get scroll value
 				scroll -= sfEvent.mouseWheel.delta * 10.0f;
+				if (scroll + overallScroll < 0.0f) scroll = 0.0f;
+				if (scroll + overallScroll > maxScroll) scroll = maxScroll - overallScroll;
+				overallScroll += scroll;
 
-				const float maxScroll = 0.0f;
-
-				if (scroll < 0.0f) scroll = 0.0f;
-				if (scroll > maxScroll) scroll = maxScroll;
+				// move buttons
+				for (int i = 0; i < buttons.size(); i++) {
+					auto a = buttons[i].background.getPosition();
+					buttons[i].setPosition(a.x, a.y - scroll);
+				}
+				// reset scroll
+				scroll = 0.0f;
 			}
 
 			// shooting button
@@ -363,57 +387,30 @@ void Game::settings() {
 
 		}
 
-		const float width = window::width / 5.0f;
-		const float height = window::height / 10.0f;
-		const float xPos = (window::width - width) / 2.0f;
-		const float yPos = window::height / 5.0f;
-
 		// draw options
-		for (int i = 0; i < 3; i++) {
-
-			// set colour
-			if (*settings::options[i])
-				button.setFillColor(sf::Color(0x22ff22ff));  // green, on
-			else
-				button.setFillColor(sf::Color(0xdd2222ff));  // red, off
-
-			// set mouse hovering values
-			button.setPosition(xPos - 10.0f, yPos - 10.0f + (height + 50.0f) * i);
-			button.setSize({ width + 20.0f, height + 20.0f });
+		for (int i = 0; i < buttonsSize; i++) {
 
 			// check if mouse is over an option and if the user can clicked mouse
-			if (sf::isPointWithinRect(mousePosition, button.getPosition(), { width, height })) {
+			buttons[i].inactive();
+			if (sf::isPointWithinRect(mousePosition, buttons[i].background.getPosition(), { width, height })) {
+				buttons[i].active();
 				if (mouseButtonDown) {
 					mouseButtonDown = false;
 
+					// swap setting
 					*settings::options[i] = !*settings::options[i];
-					if (i == 0)
-						window.setVerticalSyncEnabled(settings::isVsyncEnabled);
+					*settings::options[i]
+						? buttons[i].setColour(Colour::Button::LightGreen, Colour::Button::DarkGreen)  // green, on
+						: buttons[i].setColour(Colour::Button::LightRed, Colour::Button::DarkRed);  // red, off
 
-					if (i == 2) {
-						if (settings::playMusic) backgroundMusic.play();
-						else backgroundMusic.pause();
-					}
+					// apply any changes
+					if (i == 0) window.setVerticalSyncEnabled(settings::isVsyncEnabled);
+					if (i == 2) settings::playMusic ? backgroundMusic.play() : backgroundMusic.pause();
 
 				}
 
 			}
-			// set default values
-			else {
-				button.setPosition(xPos, yPos + (height + 50.0f) * i);
-				button.setSize({ width, height });
-			}
-			window.draw(button);
-
-
-			// draw text
-			buttonText.setString(optionNames[i]);
-			buttonText.setPosition(
-				xPos + (width - buttonText.getGlobalBounds().width) / 2.0f,
-				(yPos + (height + 50.0f) * i) + (buttonText.getGlobalBounds().height) / 4.0f
-			);
-			window.draw(buttonText);
-
+			buttons[i].draw(window);
 		}
 
 		// draw logo and UI
@@ -422,6 +419,165 @@ void Game::settings() {
 
 		// update display
 		window.display();
-		window.clear(sf::Color(30, 50, 240));
+		window.clear(Colour::Background::Background);
 	}
 }
+
+
+
+// game loop for connectiong to other devices
+void Game::networkLoop() {
+
+	// threads
+	threadActive = true;
+	bool listeningThreadActive = true;
+	std::thread listeningThread;  // listen for new connections if device is host
+
+	// load logo texture
+	sf::Texture logoTexture;
+	sf::RectangleShape logo;
+	logoTexture.loadFromFile("./assets/mainMenu/logo.psd");
+	logo.setTexture(&logoTexture);
+	logo.setSize({ window::width / 4.0f, window::height / 4.0f });
+	logo.setPosition(50.0f, 50.0f);
+
+	// size and position for buttons
+	const float width = window::width / 5.0f;
+	const float height = window::height / 10.0f;
+	const float xPos = (window::width - width) / 2.0f;
+	const float yPos = window::height / 5.0f;
+
+	// button things
+	std::string buttonText[] = { "Client", "Connect", "Ip: " };
+
+	// setup button objects
+	std::vector<Button> buttons;
+	for (int i = 0; i < 3; i++) {
+		Button button;
+		button.text.setFont(font);
+		button.background.setSize({ width, height });
+		button.text.setString(buttonText[i]);
+		button.setPosition(xPos, yPos + (height + 50.0f) * i);
+		button.setColour(Colour::Button::LightGreen, Colour::Button::DarkGreen);
+		buttons.push_back(button);
+	}
+	const int buttonsSize = buttons.size();
+
+	// mainloop for level selection
+	gameMode = Mode::settings;
+	while (window.isOpen()) {
+
+		updateGameAttributes();  // update timer and mouse values
+
+		sf::Event sfEvent;
+		while (window.pollEvent(sfEvent)) {
+
+			// close window for full screens
+			if (sfEvent.type == sf::Event::KeyPressed)
+				if (sfEvent.key.code == sf::Keyboard::Escape) {
+					listeningThreadActive = false;
+					listeningThread.joinable() ? listeningThread.join() : void();
+					return;
+				}
+
+			// shooting button
+			if (sfEvent.type == sf::Event::MouseButtonPressed && sfEvent.mouseButton.button == sf::Mouse::Left)
+				mouseButtonDown = true;
+
+			// keyboard input
+			if (sfEvent.type == sf::Event::TextEntered && buttons[0].text.getString() == "Client") {
+				char key = sfEvent.text.unicode;
+
+				// num in
+				if (((key >= '0' && key <= '9') || key == '.') && buttonText[2].size() < 19) {
+					buttonText[2] += key;
+				}
+
+				// backspace
+				else if (key == '\b' && buttonText[2].size() > 4)
+					buttonText[2].erase(buttonText[2].size() - 1, 1);
+
+				// set and realign text
+				buttons[2].text.setString(buttonText[2]);
+				buttons[2].setPosition(buttons[2].background.getPosition());
+			}
+
+		}
+
+		// draw options
+		for (int i = 0; i < buttonsSize; i++) {
+
+			// check if mouse is over an option and if the user can clicked mouse
+			buttons[i].inactive();
+			if (sf::isPointWithinRect(mousePosition, buttons[i].background.getPosition(), { width, height })) {
+				buttons[i].active();
+				if (mouseButtonDown) {
+					mouseButtonDown = false;
+
+					// toggle host/client
+					if (i == 0) {
+
+						// toggle to client
+						if (buttons[i].text.getString() == "Host") {
+							buttons[i].text.setString("Client");
+
+							// reset string to target ip
+							buttons[2].text.setString(buttonText[2]);
+							buttons[2].setPosition(buttons[2].background.getPosition());
+						}
+
+						// toggle to host
+						else {
+							buttons[i].text.setString("Host");
+
+							// set string to current ip (other devices will need to connect to host)
+							buttons[2].text.setString("Ip: 192.168.0.39");
+							buttons[2].setPosition(buttons[2].background.getPosition());
+						}
+					}
+
+					// connect button clicked
+					if (i == 1) {
+
+						std::cout << "\nEnding threads:\n";
+						threadActive = listeningThreadActive = false;
+						std::cout << "1";
+						networkThread.joinable() ? networkThread.join() : void();
+						std::cout << "2";
+						listeningThread.joinable() ? listeningThread.join() : void();
+						std::cout << "3";
+						threadActive = listeningThreadActive = true;
+						std::cout << "4";
+
+
+						if (buttons[0].text.getString() == "Host") {
+							std::cout << "Starting host\n";
+							networkThread = std::thread([&]() {server(threadActive); });
+							listeningThread= std::thread([&]() {listen(listeningThreadActive); });
+						}
+
+						else {
+							std::cout << "Starting client\n";
+							networkThread = std::thread([&]() {client(threadActive); });
+						}
+					}
+
+				}
+
+			}
+			buttons[i].draw(window);
+		}
+
+		// draw logo and UI
+		window.draw(logo);
+		drawUI();
+
+		// update display
+		window.display();
+		window.clear(Colour::Background::Background);
+	}
+	// close connection
+	listeningThreadActive = false;
+	listeningThread.join();
+}
+

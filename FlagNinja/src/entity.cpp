@@ -2,9 +2,12 @@
 #include "pch.h"
 #include "entity.h"
 
+#include "colour.h"
+
 // construct entity object
 Entity::Entity(float xPos, float yPos) {
 	setPosition(xPos, yPos);
+	health = maxHealth;
 }
 
 // getter for velocity
@@ -65,6 +68,7 @@ void Entity::checkCollision(const float deltaTime, const sf::Sprite& target, con
 	// check if entity is moving
 	if (vel.x == 0 && vel.y == 0) return;
 
+	// cache values
 	sf::Vector2f targetPos = target.getPosition();
 	sf::Vector2f targetSize = sf::Vector2f(target.getTexture()->getSize());
 
@@ -142,11 +146,13 @@ void Entity::resolveCollisions(const float deltaTime) {
 // draw health bar
 void Entity::drawHealthBar(sf::RenderWindow* window) {
 	sf::RectangleShape healthBar({ 50.0f, 5.0f });
+	
 	healthBar.setPosition(getPosition() + sf::Vector2f(0.0f, -10.0f));
-	healthBar.setFillColor(sf::Color::Red);
+	healthBar.setFillColor(Colour::HealthBar::Damaged);
 	window->draw(healthBar);
-	healthBar.setSize(sf::Vector2f((health / 2.0f), 5.0f));
-	healthBar.setFillColor(sf::Color::Green);
+	
+	healthBar.setSize(sf::Vector2f((health / maxHealth) * 50.0f, 5.0f));
+	healthBar.setFillColor(Colour::HealthBar::Normal);
 	window->draw(healthBar);
 }
 

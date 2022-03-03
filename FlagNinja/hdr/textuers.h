@@ -8,6 +8,9 @@ namespace Textures {
 	extern sf::Texture* Player_2;
 	extern sf::Texture* Player_3;
 	extern sf::Texture* Player_4;
+
+	extern sf::Texture* GoodPeng;
+	extern sf::Texture* BadPeng;
 	
 	extern sf::Texture* Enemy_1;
 	
@@ -20,6 +23,10 @@ namespace Textures {
 	
 	extern sf::Texture* Grass;
 	extern sf::Texture* Dirt;
+
+	extern sf::Texture* Snow;
+	extern sf::Texture* SnowDirt;
+
 	extern sf::Texture* Gun;
 	extern sf::Texture* Bullet;
 	

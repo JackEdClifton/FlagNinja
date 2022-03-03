@@ -4,29 +4,11 @@
 
 #include "settings.h"
 
-Enemy::Enemy(float xPos, float yPos) : Entity(xPos, yPos) {
-	initTextures();
 
-	gun.scale(0.7f, 0.7f);
-	maxVel = 100.0f;
-	maxJumps = 1;
-	jumpVel = -100.0f;
-}
+// enemy constructor
+Enemy::Enemy(float xPos, float yPos) : Entity(xPos, yPos) {}
 
-void Enemy::initTextures() {
-
-	// handle texture
-	textures[0] = Textures::Enemy_1;
-	textures[1] = Textures::Enemy_1;
-	textures[2] = Textures::Enemy_1;
-	textures[3] = Textures::Enemy_1;
-	textures[4] = Textures::Enemy_1;
-
-	setTexture(*textures[0]);
-	scale(scaleFactor);
-	size = sf::Vector2f(getTexture()->getSize()) * scaleFactor;
-}
-
+// move enemy and aim gun
 void Enemy::update(float deltaTime, const std::vector<Player>& players, const std::vector<StaticEntity>& platforms, std::vector<Bullet*>& bullets) {
 	Entity::update(deltaTime);
 
@@ -71,3 +53,52 @@ void Enemy::update(float deltaTime, const std::vector<Player>& players, const st
 }
 
 
+// bad person constructor
+BadPerson::BadPerson(float xPos, float yPos) : Enemy(xPos, yPos) {
+	initTextures();
+
+	maxVel = 100.0f;
+	maxJumps = 1;
+	jumpVel = -100.0f;
+}
+
+// load textures for bad person
+void BadPerson::initTextures() {
+
+	// handle texture
+	textures[0] = Textures::Enemy_1;
+	textures[1] = Textures::Enemy_1;
+	textures[2] = Textures::Enemy_1;
+	textures[3] = Textures::Enemy_1;
+	textures[4] = Textures::Enemy_1;
+
+	setTexture(*textures[0]);
+	scale(scaleFactor);
+	size = sf::Vector2f(getTexture()->getSize()) * scaleFactor;
+}
+
+
+// bad penguin constructor
+BadPenguin::BadPenguin(float xPos, float yPos) : Enemy(xPos, yPos) {
+	initTextures();
+
+	maxVel = 100.0f;
+	maxJumps = 1;
+	jumpVel = -100.0f;
+	health = maxHealth = 750.0f;
+}
+
+// load textures for bad penguin
+void BadPenguin::initTextures() {
+
+	// handle texture
+	textures[0] = Textures::BadPeng;
+	textures[1] = Textures::BadPeng;
+	textures[2] = Textures::BadPeng;
+	textures[3] = Textures::BadPeng;
+	textures[4] = Textures::BadPeng;
+
+	setTexture(*textures[0]);
+	scale(scaleFactor);
+	size = sf::Vector2f(getTexture()->getSize()) * scaleFactor;
+}

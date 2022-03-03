@@ -26,7 +26,8 @@ protected:
 	float jumpVel = -300.0f;
 
 	// controls
-	float health = 100.0f;
+	float maxHealth = 100.0f;
+	float health = maxHealth;
 	bool onFloor = false;
 	int maxJumps = 2;
 	int jumps = 0;

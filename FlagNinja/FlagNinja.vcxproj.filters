@@ -63,12 +63,25 @@
     <ClCompile Include="src\gameUserData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\colour.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gameDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\maps\1.txt" />
     <Text Include="assets\maps\2.txt" />
     <Text Include="assets\maps\3.txt" />
     <Text Include="assets\maps\4.txt" />
+    <Text Include="assets\maps\5.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\player\player_0.psd" />
@@ -88,7 +101,7 @@
     <None Include="assets\world\flag_0.psd" />
     <None Include="assets\world\flag_1.psd" />
     <None Include="assets\mainMenu\logo.psd" />
-    <None Include="user\userdata.jcf" />
+    <None Include="_user\_userdata.jcf" />
     <None Include="openal32.dll" />
   </ItemGroup>
   <ItemGroup>
@@ -132,6 +145,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hdr\settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\colour.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hdr\connection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
