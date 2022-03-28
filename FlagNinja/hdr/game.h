@@ -58,6 +58,7 @@ private:
 	
 	// window object
 	sf::RenderWindow window = sf::RenderWindow(sf::VideoMode(window::width, window::height), window::title, window::style);
+	
 
 	// timer (delta time between frames)
 	Timer timer;

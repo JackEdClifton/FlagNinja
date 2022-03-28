@@ -79,11 +79,9 @@ void Game::mainMenu() {
 						
 						// find first locked map
 						int latestUnlockedMap = 0;
-						while (userdata.levels[latestUnlockedMap].isUnlocked && latestUnlockedMap < maps.size()-1)
+						while (userdata.levels[latestUnlockedMap+1].isUnlocked && latestUnlockedMap < maps.size()-1)
 							latestUnlockedMap++;
 
-						// go back to the last unlocked map
-						latestUnlockedMap--;
 
 						// play the latest unloked map
 						currentMapIndex = latestUnlockedMap;
