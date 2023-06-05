@@ -16,6 +16,8 @@ namespace Textures {
 	sf::Texture* Coin_0;
 	sf::Texture* Coin_1;
 	sf::Texture* Coin_2;
+	sf::Texture* Health_0;
+	sf::Texture* Health_1;
 	
 	sf::Texture* Flag_0;
 	sf::Texture* Flag_1;
@@ -44,6 +46,8 @@ namespace Textures {
 		Coin_0 = new sf::Texture();
 		Coin_1 = new sf::Texture();
 		Coin_2 = new sf::Texture();
+		Health_0 = new sf::Texture();
+		Health_1 = new sf::Texture();
 		
 		Flag_0 = new sf::Texture();
 		Flag_1 = new sf::Texture();
@@ -65,14 +69,6 @@ namespace Textures {
 		allLoaded &= Player_3->loadFromFile("./assets/player/player_3.psd");
 		allLoaded &= Player_4->loadFromFile("./assets/player/player_4.psd");
 
-		// tmp
-		//allLoaded &= Player_0->loadFromFile("./assets/player/goodPeng.psd");
-		//allLoaded &= Player_1->loadFromFile("./assets/player/goodPeng.psd");
-		//allLoaded &= Player_2->loadFromFile("./assets/player/goodPeng.psd");
-		//allLoaded &= Player_3->loadFromFile("./assets/player/goodPeng.psd");
-		//allLoaded &= Player_4->loadFromFile("./assets/player/goodPeng.psd");
-		// tmp
-
 		allLoaded &= GoodPeng->loadFromFile("./assets/player/goodPeng.psd");
 		allLoaded &= BadPeng->loadFromFile("./assets/enemy/badPeng.psd");
 
@@ -81,6 +77,8 @@ namespace Textures {
 		allLoaded &= Coin_0->loadFromFile("./assets/world/coin_0.psd");
 		allLoaded &= Coin_1->loadFromFile("./assets/world/coin_1.psd");
 		allLoaded &= Coin_2->loadFromFile("./assets/world/coin_2.psd");
+		allLoaded &= Health_0->loadFromFile("./assets/collectables/health_0.psd");
+		allLoaded &= Health_1->loadFromFile("./assets/collectables/health_1.psd");
 		
 		allLoaded &= Flag_0->loadFromFile("./assets/world/flag_0.psd");
 		allLoaded &= Flag_1->loadFromFile("./assets/world/flag_1.psd");
@@ -105,6 +103,7 @@ namespace Textures {
 			Player_0, Player_1, Player_2, Player_3, Player_4,
 			Enemy_1,
 			Coin_0, Coin_1, Coin_2,
+			Health_0, Health_1,
 			Flag_0, Flag_1,
 			Grass, Dirt, Gun, Bullet;
 	}

@@ -9,6 +9,4 @@ int main() {
 	Game game;
 
 	std::cout << "\n[Program Finished]";
-	//std::this_thread::sleep_for(std::chrono::seconds(2));
 }
-

@@ -1,7 +1,6 @@
 
 #include "pch.h"
-#include "enemy.h"
-
+#include "entity.h"
 #include "settings.h"
 
 
@@ -45,11 +44,19 @@ void Enemy::update(float deltaTime, const std::vector<Player>& players, const st
 	}
 	// aim gun and shoot player
 	gun.aimTowards(target);
-	if (shootGun && closestPlayer < minShootDistance - aimDistance)
+	if (shootGun && closestPlayer < minShootDistance - aimDistance) {
+		
 		shoot(bullets);
 
-	//moveRight();
-	jump();
+		// move left
+		if (target.x < getPosition().x - 64.0f) {
+			moveLeft();
+		}
+		// move right
+		else  if (target.x > getPosition().x + 96.0f) {
+			moveRight();
+		}
+	}
 }
 
 

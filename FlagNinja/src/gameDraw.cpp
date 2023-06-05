@@ -1,7 +1,6 @@
 
 #include "pch.h"
 #include "game.h"
-
 #include "colour.h"
 #include "button.h"
 
@@ -97,9 +96,9 @@ void Game::drawObjects() {
 		enemy->drawHealthBar(&window);
 	}
 
-
 	for (auto& obj : bullets) window.draw(*obj);
 	for (auto& obj : coins) window.draw(obj);
+	for (auto& obj : collectables) window.draw(obj);
 
 	window.draw(flag);
 }
@@ -144,7 +143,7 @@ void Game::drawUI() {
 		window.draw(text);
 
 		// temp max bullets
-		static unsigned int maxSize = 0;
+		static size_t maxSize = 0;
 		maxSize = std::max(maxSize, bullets.size());
 		text.move(text.getGlobalBounds().width + 50.0f, 0.0f);
 		text.setString("Max Bullets: " + std::to_string(maxSize));

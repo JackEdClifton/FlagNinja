@@ -1,6 +1,6 @@
 #pragma once
 
-#include "staticEntity.h"
+#include "entity.h"
 
 class Flag : public StaticEntity {
 	sf::Texture* textures[2];

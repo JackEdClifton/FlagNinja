@@ -3,16 +3,16 @@
 #include "collectables.h"
 
 
-Coin::Coin(float x, float y) : StaticEntity(x, y) {
-	textures[0] = Textures::Coin_0;
-	textures[1] = Textures::Coin_1;
-	textures[2] = Textures::Coin_2;
-	textures[3] = Textures::Coin_1;
+Collectables::Collectables(float x, float y) : StaticEntity(x, y) {
+	textures[0] = Textures::Health_0;
+	textures[1] = Textures::Health_1;
+	textures[2] = Textures::Health_0;
+	textures[3] = Textures::Health_1;
 
 	setTexture(*textures[0]);
 }
 
-void Coin::updateAnimation(float deltaTime) {
+void Collectables::updateAnimation(float deltaTime) {
 
 	if (animationCooldown > 0.0f) {
 		animationCooldown -= deltaTime;
@@ -27,6 +27,10 @@ void Coin::updateAnimation(float deltaTime) {
 	setTexture(*textures[animation]);
 }
 
-void Coin::update(float deltaTime) {
+void Collectables::update(float deltaTime) {
 	updateAnimation(deltaTime);
 }
+
+
+
+

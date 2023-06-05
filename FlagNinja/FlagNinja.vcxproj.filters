@@ -75,6 +75,9 @@
     <ClCompile Include="src\gameDraw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\collectables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="assets\maps\1.txt" />
@@ -114,9 +117,6 @@
     <ClInclude Include="hdr\gun.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hdr\player.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="hdr\sfmlExtension.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -132,13 +132,7 @@
     <ClInclude Include="hdr\bullet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hdr\enemy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="hdr\coin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="hdr\staticEntity.h">
+    <ClInclude Include="hdr\collectables.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hdr\flag.h">
@@ -162,6 +156,13 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\audio\project 1.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="assets\audio\collection.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="assets\audio\gun 1.mp3" />
+    <Media Include="assets\audio\gun 2.wav">
       <Filter>Resource Files</Filter>
     </Media>
   </ItemGroup>

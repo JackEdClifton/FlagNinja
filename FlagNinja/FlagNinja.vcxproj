@@ -196,6 +196,7 @@
     <ClCompile Include="src\bullet.cpp" />
     <ClCompile Include="src\button.cpp" />
     <ClCompile Include="src\coin.cpp" />
+    <ClCompile Include="src\collectables.cpp" />
     <ClCompile Include="src\colour.cpp" />
     <ClCompile Include="src\connection.cpp" />
     <ClCompile Include="src\enemy.cpp" />
@@ -254,19 +255,16 @@
   <ItemGroup>
     <ClInclude Include="hdr\bullet.h" />
     <ClInclude Include="hdr\button.h" />
-    <ClInclude Include="hdr\coin.h" />
+    <ClInclude Include="hdr\collectables.h" />
     <ClInclude Include="hdr\colour.h" />
     <ClInclude Include="hdr\connection.h" />
-    <ClInclude Include="hdr\enemy.h" />
     <ClInclude Include="hdr\entity.h" />
     <ClInclude Include="hdr\flag.h" />
     <ClInclude Include="hdr\game.h" />
     <ClInclude Include="hdr\gun.h" />
     <ClInclude Include="hdr\pch.h" />
-    <ClInclude Include="hdr\player.h" />
     <ClInclude Include="hdr\settings.h" />
     <ClInclude Include="hdr\sfmlExtension.h" />
-    <ClInclude Include="hdr\staticEntity.h" />
     <ClInclude Include="hdr\textuers.h" />
     <ClInclude Include="hdr\timer.h" />
   </ItemGroup>
@@ -279,6 +277,9 @@
     <Font Include="assets\fonts\comic.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <Media Include="assets\audio\collection.wav" />
+    <Media Include="assets\audio\gun 1.mp3" />
+    <Media Include="assets\audio\gun 2.wav" />
     <Media Include="assets\audio\project 1.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

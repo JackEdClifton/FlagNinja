@@ -1,7 +1,6 @@
 
 #include "pch.h"
 #include "game.h"
-
 #include "colour.h"
 #include "button.h"
 
@@ -41,6 +40,10 @@ Game::Game() {
 	backgroundMusic.setBuffer(backgroundMusicBuffer);
 	backgroundMusic.setVolume(20.0f);
 	backgroundMusic.setLoop(true);
+
+	collectionBuffer.loadFromFile("./assets/audio/collection.wav");
+	collectionSound.setBuffer(collectionBuffer);
+	collectionSound.setVolume(5.0f);
 
 	// apply settings
 	window.setVerticalSyncEnabled(settings::isVsyncEnabled);
@@ -122,6 +125,9 @@ void Game::readMap(const std::string& filename) {
 				coins.emplace_back(x, y);
 				totalCoins += 1;
 			}
+			else if (chr == 'h') {
+				collectables.emplace_back(x, y);
+			}
 
 			// player
 			else if (chr == 'p') {
@@ -177,6 +183,7 @@ void Game::moveObjects(const sf::Vector2f& displacement) {
 	for (auto& obj : bullets) obj->move(displacement);
 	for (auto& obj : platforms) obj.move(displacement);
 	for (auto& obj : coins) obj.move(displacement);
+	for (auto& obj : collectables) obj.move(displacement);
 	flag.move(displacement);
 	overallCameraDisplacement += displacement;
 	maxFallHeight += displacement.y;
@@ -240,6 +247,8 @@ void Game::handleCollisions() {
 	// players
 	for (auto& player : players) {
 		if (player.getPaused()) continue;
+
+		// check collisions with platforms
 		for (auto& platform : platforms)
 			player.checkCollision(deltaTime, platform);
 		player.resolveCollisions(deltaTime);
@@ -247,6 +256,15 @@ void Game::handleCollisions() {
 		// if player has fell out of world exit game
 		if (player.getPosition().y > maxFallHeight)
 			gameMode = Mode::mainMenu;
+
+		// collectables
+		for (unsigned int i = 0; i < collectables.size(); i++) {
+			if (isColliding(player, collectables[i])) {
+				collectionSound.play();
+				player.hit(-10.0f);
+				collectables.erase(std::next(collectables.begin(), i), std::next(collectables.begin(), i+1));
+			}
+		}
 	}
 
 	// enemys
@@ -263,14 +281,14 @@ void Game::handleCollisions() {
 		// timeout
 		if (bullets[i]->bulletTimeout(deltaTime)) {
 			destroyBullet(i);
-			goto exitBulletLoop;
+			goto continueBulletLoop;
 		}
 
 		// platforms
 		for (auto& platform : platforms) {
 			if (isColliding(*bullets[i], platform)) {
 				destroyBullet(i);
-				goto exitBulletLoop;
+				goto continueBulletLoop;
 			}
 		}
 
@@ -285,7 +303,7 @@ void Game::handleCollisions() {
 					gameMode = Mode::mainMenu;
 				}
 				destroyBullet(i);
-				goto exitBulletLoop;
+				goto continueBulletLoop;
 			}
 		}
 
@@ -297,11 +315,11 @@ void Game::handleCollisions() {
 					score += 100;
 				}
 				destroyBullet(i);
-				goto exitBulletLoop;
+				goto continueBulletLoop;
 			}
 		}
 		continue;
-	exitBulletLoop:
+	continueBulletLoop:
 		i--;
 	}
 
@@ -309,6 +327,7 @@ void Game::handleCollisions() {
 	for (unsigned int j = 0; j < players.size(); j++) {
 		for (unsigned int i = 0; i < coins.size(); i++) {
 			if (isColliding(coins[i], players[j])) {
+				collectionSound.play();
 				score += 20;
 				coins[i] = coins[coins.size() - 1];
 				coins.pop_back();
@@ -334,6 +353,7 @@ void Game::updateEntitys() {
 	for (auto& obj : players) obj.update(deltaTime, mousePosition);
 	for (auto& obj : enemies) obj->update(deltaTime, players, platforms, bullets);
 	for (auto& obj : coins) obj.update(deltaTime);
+	for (auto& obj : collectables) obj.update(deltaTime);
 	flag.update(deltaTime);
 }
 

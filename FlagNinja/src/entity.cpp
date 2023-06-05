@@ -1,13 +1,15 @@
 
 #include "pch.h"
 #include "entity.h"
-
 #include "colour.h"
 
 // construct entity object
 Entity::Entity(float xPos, float yPos) {
 	setPosition(xPos, yPos);
 	health = maxHealth;
+
+	gunBuffer.loadFromFile("./assets/audio/gun 2.wav");
+	gunSound.setBuffer(gunBuffer);
 }
 
 // getter for velocity
@@ -158,14 +160,19 @@ void Entity::drawHealthBar(sf::RenderWindow* window) {
 
 // spawn a bullet obj
 void Entity::shoot(std::vector<Bullet*>& bullets) {
+
 	if (shootDelay == 0.0f) {
 		bullets.push_back(new Bullet(gun.getPosition(), gun.getUnitVector()));
 		shootDelay = maxShootDelay;
+		gunSound.play();
 	}
 }
 
 bool Entity::hit(float damage) {
 	health -= damage;
+	if (health > maxHealth) {
+		health = maxHealth;
+	}
 	return health <= 0.0f;
 }
 

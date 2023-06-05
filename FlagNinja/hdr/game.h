@@ -1,12 +1,10 @@
 #pragma once
 
 #include "timer.h"
-#include "player.h"
+#include "entity.h"
 #include "bullet.h"
-#include "enemy.h"
-#include "coin.h"
+#include "collectables.h"
 #include "flag.h"
-#include "staticEntity.h"
 
 // container for window settings
 namespace window {
@@ -49,8 +47,8 @@ struct UserData {
 // main game class
 class Game {
 
-	// constructor & destructor
 public:
+	// constructor & destructor
 	Game();
 	~Game();
 
@@ -100,6 +98,8 @@ private:
 	// audio
 	sf::SoundBuffer backgroundMusicBuffer;
 	sf::Sound backgroundMusic;
+	sf::SoundBuffer collectionBuffer;
+	sf::Sound collectionSound;
 
 	// drawable objects
 	std::vector<Player> players;
@@ -107,11 +107,11 @@ private:
 	std::vector<Bullet*> bullets;
 	std::vector<StaticEntity> platforms;
 	std::vector<Coin> coins;
+	std::vector<Collectables> collectables;
 	Flag flag;
 
 	// new objects to send to networked devices
 	std::vector<Bullet*> newBullets;
-
 
 	// game loops
 	void mainMenu();
@@ -134,12 +134,12 @@ private:
 	void drawPauseMenu();  // draw dimming and options for in-game pause menu
 	void drawObjects();  // draw objects
 	void drawUI();  // draw user interface
-	void destroyBullet(unsigned int index);
-	void destroyEnemy(unsigned int index);
-	void loadUserData();
-	void saveUserData();
+	void destroyBullet(unsigned int index);  // delete bullet object upon collision
+	void destroyEnemy(unsigned int index);  // delete an enemy once killed
+	void loadUserData();  // read and parse data
+	void saveUserData();  // format and write data to storage
 
-	// networking
+	// networking (unstable)
 	static void listen(bool& threadActive);
 	static void server(bool& threadActive);
 	static void client(bool& threadActive);

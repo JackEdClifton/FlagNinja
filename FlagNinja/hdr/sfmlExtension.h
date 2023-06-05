@@ -1,10 +1,9 @@
 #pragma once
 
-#include "staticEntity.h"
+#include "entity.h"
 #include "bullet.h"
 
 std::ostream& operator<<(std::ostream&, sf::Vector2f);
-
 
 namespace sf {
 
